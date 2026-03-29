@@ -1,0 +1,211 @@
+{
+  "orders": [
+    {
+      "id": "ORD-428HB1D",
+      "userId": null,
+      "items": [
+        {
+          "id": "p1",
+          "name": "Everyday Tee",
+          "price": 24.99,
+          "image": "/src/assets/everyday-tee.svg",
+          "category": "Tops",
+          "description": "Soft, breathable cotton tee — perfect for daily wear.",
+          "qty": 1,
+          "quantity": 1
+        }
+      ],
+      "total": 74.99,
+      "currency": "USD",
+      "currentStatus": "Placed",
+      "createdAt": 1774277373091,
+      "updatedAt": 1774277373091,
+      "eta": null,
+      "trackingNumber": null,
+      "carrier": null,
+      "metadata": {}
+    },
+    {
+      "id": "ORD-E3Y84FQ",
+      "userId": null,
+      "items": [
+        {
+          "id": "p3",
+          "name": "Denim Jacket",
+          "price": 89.99,
+          "image": "/src/assets/denim-jacket.svg",
+          "category": "Tops",
+          "description": "Classic denim with modern tailoring.",
+          "qty": 1,
+          "quantity": 1
+        }
+      ],
+      "total": 189.99,
+      "currency": "USD",
+      "currentStatus": "Cancelled",
+      "createdAt": 1774274239559,
+      "updatedAt": 1774275035208,
+      "eta": null,
+      "trackingNumber": null,
+      "carrier": null,
+      "metadata": {}
+    },
+    {
+      "id": "ORD-G830VVX",
+      "userId": null,
+      "items": [
+        {
+          "id": "p2",
+          "name": "Chic Dress",
+          "price": 9000,
+          "image": "/src/assets/chic-dress.svg",
+          "category": "Dresses",
+          "description": "Flowy silhouette designed for comfort and style.",
+          "qty": 1,
+          "quantity": 1
+        }
+      ],
+      "total": 9050,
+      "currency": "USD",
+      "currentStatus": "Out For Delivery",
+      "createdAt": 1774274109637,
+      "updatedAt": 1774375848326,
+      "eta": null,
+      "trackingNumber": null,
+      "carrier": null,
+      "metadata": {}
+    },
+    {
+      "id": "ORD-6M4M8S3",
+      "userId": null,
+      "items": [
+        {
+          "id": "p2",
+          "name": "Chic Dress",
+          "price": 9000,
+          "image": "/src/assets/chic-dress.svg",
+          "category": "Dresses",
+          "description": "Flowy silhouette designed for comfort and style.",
+          "qty": 1,
+          "quantity": 1
+        }
+      ],
+      "total": 9050,
+      "currency": "USD",
+      "currentStatus": "Placed",
+      "createdAt": 1774271578737,
+      "updatedAt": 1774271578737,
+      "eta": null,
+      "trackingNumber": null,
+      "carrier": null,
+      "metadata": {}
+    },
+    {
+      "id": "TEST-001",
+      "userId": null,
+      "items": [],
+      "total": 10,
+      "currency": "USD",
+      "currentStatus": "Cancelled",
+      "createdAt": 1774226093918,
+      "updatedAt": 1774275326642,
+      "eta": null,
+      "trackingNumber": null,
+      "carrier": null,
+      "metadata": {}
+    }
+  ],
+  "history": [
+    {
+      "orderId": "TEST-001",
+      "status": "Placed",
+      "timestamp": 1774226093918,
+      "actorId": "system",
+      "note": "order created"
+    },
+    {
+      "orderId": "TEST-001",
+      "status": "Confirmed",
+      "timestamp": 1774226128258,
+      "actorId": "admin",
+      "note": null,
+      "idempotencyKey": null
+    },
+    {
+      "orderId": "ORD-6M4M8S3",
+      "status": "Placed",
+      "timestamp": 1774271578737,
+      "actorId": "system",
+      "note": "order created"
+    },
+    {
+      "orderId": "ORD-G830VVX",
+      "status": "Placed",
+      "timestamp": 1774274109637,
+      "actorId": "system",
+      "note": "order created"
+    },
+    {
+      "orderId": "ORD-G830VVX",
+      "status": "Confirmed",
+      "timestamp": 1774274181882,
+      "actorId": "admin",
+      "note": null,
+      "idempotencyKey": null
+    },
+    {
+      "orderId": "ORD-E3Y84FQ",
+      "status": "Placed",
+      "timestamp": 1774274239559,
+      "actorId": "system",
+      "note": "order created"
+    },
+    {
+      "orderId": "ORD-G830VVX",
+      "status": "Packed",
+      "timestamp": 1774275029215,
+      "actorId": "admin",
+      "note": null,
+      "idempotencyKey": null
+    },
+    {
+      "orderId": "ORD-E3Y84FQ",
+      "status": "Cancelled",
+      "timestamp": 1774275035208,
+      "actorId": "admin",
+      "note": null,
+      "idempotencyKey": null
+    },
+    {
+      "orderId": "TEST-001",
+      "status": "Cancelled",
+      "timestamp": 1774275326642,
+      "actorId": "admin",
+      "note": null,
+      "idempotencyKey": null
+    },
+    {
+      "orderId": "ORD-G830VVX",
+      "status": "Shipped",
+      "timestamp": 1774275486517,
+      "actorId": "admin",
+      "note": null,
+      "idempotencyKey": null
+    },
+    {
+      "orderId": "ORD-428HB1D",
+      "status": "Placed",
+      "timestamp": 1774277373091,
+      "actorId": "system",
+      "note": "order created"
+    },
+    {
+      "orderId": "ORD-G830VVX",
+      "status": "Out For Delivery",
+      "timestamp": 1774375848326,
+      "actorId": "admin",
+      "note": null,
+      "idempotencyKey": null
+    }
+  ]
+}

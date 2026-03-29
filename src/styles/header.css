@@ -1,0 +1,18 @@
+.site-header{
+	position:fixed;top:0;left:0;width:100%;z-index:60;border-bottom:none;
+	transform:translateY(-120%);opacity:0;pointer-events:none;
+	transition:transform .28s cubic-bezier(.2,.9,.2,1),opacity .28s ease;
+	background:transparent;
+}
+.site-header.visible{
+	transform:translateY(0);opacity:1;pointer-events:auto;
+	backdrop-filter:blur(6px);
+	background:rgba(255,255,255,0.85);
+	border-bottom:1px solid rgba(16,16,20,0.03);
+}
+.header-inner{padding:18px 16px}
+.brand{font-size:1.4rem;margin:0;cursor:pointer;font-family:'Playfair Display', Georgia, serif;font-weight:700}
+.brand img{height:50px;display:inline-block;vertical-align:middle}
+.cart-btn{background:var(--accent);border:none;padding:8px 12px;border-radius:999px;cursor:pointer;color:#fff;box-shadow:0 8px 22px rgba(185,79,89,0.12);transition:transform .18s ease,box-shadow .18s ease}
+.cart-btn:hover{transform:translateY(-3px);box-shadow:0 14px 34px rgba(185,79,89,0.16)}
+.cart-count{background:#fff;color:var(--accent);padding:2px 8px;border-radius:999px;margin-left:8px;font-weight:700}

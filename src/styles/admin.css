@@ -1,0 +1,16 @@
+.admin .admin-form input{display:block;width:100%;padding:8px;margin:6px 0;border-radius:8px;border:1px solid #eee}
+.admin-list .card{background:transparent;box-shadow:none}
+.admin-list .card img{width:84px;height:84px;object-fit:cover;border-radius:8px}
+
+.admin-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:12px}
+.stats{display:flex;gap:12px;align-items:center}
+.stat{background:linear-gradient(180deg,#fff,#fbfdff);padding:8px 12px;border-radius:8px;border:1px solid rgba(16,16,20,0.04);text-align:center;min-width:88px}
+.stat-value{font-weight:700;font-size:1.05rem}
+.stat-label{font-size:0.85rem;color:var(--muted)}
+.admin-search{padding:8px 10px;border-radius:8px;border:1px solid #eee;width:220px}
+
+@media (max-width:700px){
+	.admin-top{flex-direction:column;align-items:flex-start}
+	.admin-search{width:100%}
+}
+

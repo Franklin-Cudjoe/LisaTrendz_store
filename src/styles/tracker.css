@@ -1,0 +1,108 @@
+.tracker { padding: 24px 16px; }
+
+.tracker-form { display: flex; gap: 8px; margin: 8px 0; }
+.tracker-form input { flex: 1; padding: 10px; border-radius: 8px; border: 1px solid #eee; }
+
+/* Pipeline stepper */
+.status-pipeline {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 8px 0;
+}
+
+.pipeline-step {
+  display: flex;
+  gap: 16px;
+  align-items: stretch;
+  min-height: 52px;
+}
+
+.pipeline-left {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 20px;
+  flex-shrink: 0;
+}
+
+.pipeline-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid #d1d5db;
+  background: #fff;
+  flex-shrink: 0;
+  margin-top: 4px;
+  transition: all 0.2s;
+}
+
+.pipeline-line {
+  flex: 1;
+  width: 2px;
+  background: #e5e7eb;
+  margin: 3px 0;
+}
+
+.pipeline-label {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  padding-bottom: 20px;
+  gap: 2px;
+}
+
+.pipeline-status {
+  font-size: .95rem;
+  color: #c0c4cc;
+  font-weight: 400;
+  line-height: 1.4;
+}
+
+.pipeline-time {
+  font-size: .78rem;
+  color: #9ca3af;
+}
+
+/* Done step */
+.pipeline-step.done .pipeline-dot {
+  background: var(--primary, #0f7490);
+  border-color: var(--primary, #0f7490);
+}
+.pipeline-step.done .pipeline-line {
+  background: var(--primary, #0f7490);
+}
+.pipeline-step.done .pipeline-status {
+  color: var(--primary, #0f7490);
+  font-weight: 500;
+}
+
+/* Current step */
+.pipeline-step.current .pipeline-dot {
+  width: 16px;
+  height: 16px;
+  background: var(--primary, #0f7490);
+  border-color: var(--primary, #0f7490);
+  box-shadow: 0 0 0 4px rgba(15,116,144,0.18);
+}
+.pipeline-step.current .pipeline-line {
+  background: #e5e7eb;
+}
+.pipeline-step.current .pipeline-status {
+  color: var(--primary, #0f7490);
+  font-weight: 700;
+  font-size: 1rem;
+}
+.pipeline-step.current .pipeline-time {
+  color: var(--primary, #0f7490);
+  font-weight: 500;
+}
+
+/* Future step */
+.pipeline-step.future .pipeline-dot {
+  border-color: #e5e7eb;
+  background: #f9fafb;
+}
+.pipeline-step.future .pipeline-status {
+  color: #d1d5db;
+}

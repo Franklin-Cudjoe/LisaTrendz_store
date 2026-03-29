@@ -1,0 +1,12 @@
+.checkout{padding:12px 16px}
+.checkout-grid{display:grid;grid-template-columns:1fr 320px;gap:18px}
+.checkout-form input{width:100%;padding:10px;margin:6px 0;border-radius:8px;border:1px solid #eee}
+.checkout-summary{background:#fff;padding:12px;border-radius:10px;box-shadow:0 8px 20px rgba(20,20,40,0.04)}
+.summary-item{display:flex;justify-content:space-between;padding:6px 0}
+.summary-total{margin-top:12px}
+.note{font-size:0.9rem;color:var(--muted);margin:8px 0}
+
+/* Modal wrapper for checkout */
+.checkout-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:120;display:flex;align-items:center;justify-content:center;padding:20px}
+.checkout-modal{width:min(1000px,96vw);max-height:90vh;overflow:auto;border-radius:12px;background:linear-gradient(180deg,#ffffff,#fbfdff);box-shadow:0 30px 80px rgba(10,10,30,0.25);padding:18px}
+
