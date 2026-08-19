@@ -1,108 +1,31 @@
-.tracker { padding: 24px 16px; }
+.tracker{
+  padding:20px 14px;max-width:760px;margin:22px auto;background:linear-gradient(150deg,rgba(255,255,255,.7),rgba(255,255,255,.44));
+  border:1px solid var(--line-light);border-radius:8px;box-shadow:var(--shadow-soft),inset 0 1px 0 rgba(255,255,255,.62);backdrop-filter:blur(24px) saturate(155%);
+}
+.tracker h2{font-family:Georgia,serif;font-size:2rem;line-height:1;margin:0 0 10px}
+.tracker-form{display:grid;grid-template-columns:1fr;gap:8px;margin:12px 0}
+.tracker-form input{width:100%;padding:13px 12px;border-radius:8px;border:1px solid rgba(32,35,42,.12);background:rgba(255,255,255,.54);box-shadow:inset 0 1px 0 rgba(255,255,255,.62)}
 
-.tracker-form { display: flex; gap: 8px; margin: 8px 0; }
-.tracker-form input { flex: 1; padding: 10px; border-radius: 8px; border: 1px solid #eee; }
+.status-pipeline{display:flex;flex-direction:column;gap:0;padding:12px 0}
+.pipeline-step{display:flex;gap:16px;align-items:stretch;min-height:54px}
+.pipeline-left{display:flex;flex-direction:column;align-items:center;width:20px;flex-shrink:0}
+.pipeline-dot{width:14px;height:14px;border-radius:50%;border:2px solid rgba(32,35,42,.16);background:rgba(255,255,255,.72);flex-shrink:0;margin-top:4px;transition:all .2s}
+.pipeline-line{flex:1;width:2px;background:rgba(32,35,42,.12);margin:3px 0}
+.pipeline-label{display:flex;flex-direction:column;justify-content:flex-start;padding-bottom:20px;gap:2px}
+.pipeline-status{font-size:.95rem;color:#a2aba8;font-weight:500;line-height:1.4}
+.pipeline-time{font-size:.78rem;color:#8d9894}
 
-/* Pipeline stepper */
-.status-pipeline {
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-  padding: 8px 0;
-}
+.pipeline-step.done .pipeline-dot{background:var(--primary);border-color:rgba(255,255,255,.55);box-shadow:0 0 0 4px rgba(15,118,110,.1)}
+.pipeline-step.done .pipeline-line{background:linear-gradient(180deg,var(--primary),rgba(15,118,110,.22))}
+.pipeline-step.done .pipeline-status{color:var(--primary);font-weight:750}
+.pipeline-step.current .pipeline-dot{width:16px;height:16px;background:var(--accent);border-color:rgba(255,255,255,.7);box-shadow:0 0 0 6px rgba(15,118,110,.14)}
+.pipeline-step.current .pipeline-line{background:rgba(32,35,42,.12)}
+.pipeline-step.current .pipeline-status{color:var(--ink);font-weight:850;font-size:1rem}
+.pipeline-step.current .pipeline-time{color:var(--accent-2);font-weight:750}
+.pipeline-step.future .pipeline-dot{border-color:rgba(32,35,42,.1);background:rgba(255,255,255,.5)}
+.pipeline-step.future .pipeline-status{color:#b5bebb}
 
-.pipeline-step {
-  display: flex;
-  gap: 16px;
-  align-items: stretch;
-  min-height: 52px;
-}
-
-.pipeline-left {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 20px;
-  flex-shrink: 0;
-}
-
-.pipeline-dot {
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  border: 2px solid #d1d5db;
-  background: #fff;
-  flex-shrink: 0;
-  margin-top: 4px;
-  transition: all 0.2s;
-}
-
-.pipeline-line {
-  flex: 1;
-  width: 2px;
-  background: #e5e7eb;
-  margin: 3px 0;
-}
-
-.pipeline-label {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  padding-bottom: 20px;
-  gap: 2px;
-}
-
-.pipeline-status {
-  font-size: .95rem;
-  color: #c0c4cc;
-  font-weight: 400;
-  line-height: 1.4;
-}
-
-.pipeline-time {
-  font-size: .78rem;
-  color: #9ca3af;
-}
-
-/* Done step */
-.pipeline-step.done .pipeline-dot {
-  background: var(--primary, #0f7490);
-  border-color: var(--primary, #0f7490);
-}
-.pipeline-step.done .pipeline-line {
-  background: var(--primary, #0f7490);
-}
-.pipeline-step.done .pipeline-status {
-  color: var(--primary, #0f7490);
-  font-weight: 500;
-}
-
-/* Current step */
-.pipeline-step.current .pipeline-dot {
-  width: 16px;
-  height: 16px;
-  background: var(--primary, #0f7490);
-  border-color: var(--primary, #0f7490);
-  box-shadow: 0 0 0 4px rgba(15,116,144,0.18);
-}
-.pipeline-step.current .pipeline-line {
-  background: #e5e7eb;
-}
-.pipeline-step.current .pipeline-status {
-  color: var(--primary, #0f7490);
-  font-weight: 700;
-  font-size: 1rem;
-}
-.pipeline-step.current .pipeline-time {
-  color: var(--primary, #0f7490);
-  font-weight: 500;
-}
-
-/* Future step */
-.pipeline-step.future .pipeline-dot {
-  border-color: #e5e7eb;
-  background: #f9fafb;
-}
-.pipeline-step.future .pipeline-status {
-  color: #d1d5db;
+@media (min-width:640px){
+  .tracker{padding:26px 22px;margin:28px auto}
+  .tracker-form{grid-template-columns:1fr auto}
 }

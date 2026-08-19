@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from "react";
-import Lenis from "@studio-freight/lenis";
+import React, { useState, useEffect, useMemo } from "react";
 import Header from "./components/Header.jsx";
 import Footer from "./components/Footer.jsx";
 import Home from "./components/Home.jsx";
@@ -10,6 +9,51 @@ import OrderTracker from "./components/OrderTracker.jsx";
 import Admin from "./components/Admin.jsx";
 import AdminLogin from "./components/AdminLogin.jsx";
 import defaultProducts from "./data/products.js";
+import { CATEGORY_ALL, DEFAULT_CATEGORIES } from "./data/categories.js";
+import { normalizeProductImages } from "./utils/productImages.js";
+import { fetchProducts } from "./services/storeApi.js";
+
+function readStoredProducts() {
+  try {
+    if (typeof window === "undefined" || !window.localStorage) return null;
+
+    const raw = window.localStorage.getItem("products");
+    if (!raw) return null;
+
+    const parsed = JSON.parse(raw);
+    if (Array.isArray(parsed) && parsed.length > 0) {
+      return parsed.map(normalizeProductImages);
+    }
+  } catch (e) {}
+
+  return null;
+}
+
+function cleanCategoryName(name) {
+  return typeof name === "string" ? name.trim() : "";
+}
+
+function categoryKey(name) {
+  return cleanCategoryName(name).toLowerCase();
+}
+
+function uniqueCategories(names) {
+  const seen = new Set();
+
+  return names.reduce((list, name) => {
+    const clean = cleanCategoryName(name);
+    const key = categoryKey(clean);
+
+    if (!clean || seen.has(key)) return list;
+
+    seen.add(key);
+    return [...list, clean];
+  }, []);
+}
+
+function isVisibleProduct(product) {
+  return product && product.active !== false;
+}
 
 export default function App() {
   const [view, setView] = useState("home");
@@ -19,17 +63,11 @@ export default function App() {
   const [checkoutDelivery, setCheckoutDelivery] = useState(null);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [orderConfirm, setOrderConfirm] = useState(null); // { id, total }
-  const [category, setCategory] = useState("All");
-  const [productList, setProductList] = useState(() => {
-    const raw = localStorage.getItem("products");
-    if (raw) {
-      try {
-        const parsed = JSON.parse(raw);
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
-      } catch (e) {}
-    }
-    return defaultProducts;
-  });
+  const [lastOrderId, setLastOrderId] = useState(null);
+  const [category, setCategory] = useState(CATEGORY_ALL);
+  const [productList, setProductList] = useState(
+    () => readStoredProducts() || defaultProducts.map(normalizeProductImages),
+  );
   const [adminAuth, setAdminAuth] = useState(() => {
     try {
       return sessionStorage.getItem("adminAuth") === "true";
@@ -82,84 +120,52 @@ export default function App() {
     } catch (e) {}
   }, []);
 
+  const categories = useMemo(() => {
+    const productCategories = productList
+      .filter(isVisibleProduct)
+      .map((product) => product.category);
+
+    return uniqueCategories([...DEFAULT_CATEGORIES, ...productCategories]);
+  }, [productList]);
+
+  const visibleProducts = useMemo(() => {
+    const publicProducts = productList.filter(isVisibleProduct);
+
+    if (category === CATEGORY_ALL) return publicProducts;
+
+    const selectedCategoryKey = categoryKey(category);
+    return publicProducts.filter(
+      (product) => categoryKey(product.category) === selectedCategoryKey,
+    );
+  }, [category, productList]);
+
   useEffect(() => {
-    // respect user preference for reduced motion
-    const reduce =
-      typeof window !== "undefined" &&
-      window.matchMedia &&
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-    if (reduce) return;
-
-    // avoid multiple Lenis instances during HMR/dev reloads
-    if (window.__lenis) {
-      try {
-        window.__lenis.destroy();
-      } catch (e) {}
-      window.__lenis = null;
+    if (
+      category !== CATEGORY_ALL &&
+      !categories.some((name) => categoryKey(name) === categoryKey(category))
+    ) {
+      setCategory(CATEGORY_ALL);
     }
+  }, [categories, category]);
 
-    const lenis = new Lenis({
-      duration: 0.9,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-      smooth: true,
-      direction: "vertical",
-      gestureOrientation: "vertical",
-      smoothTouch: true,
-      wheelMultiplier: 1,
-      touchMultiplier: 2,
-    });
-
-    window.__lenis = lenis;
-
-    let rafId = null;
-    const loop = (time) => {
-      lenis.raf(time);
-      rafId = requestAnimationFrame(loop);
-    };
-
-    rafId = requestAnimationFrame(loop);
-
-    return () => {
-      if (rafId) cancelAnimationFrame(rafId);
-      try {
-        lenis.destroy();
-      } catch (e) {}
-      if (window.__lenis === lenis) window.__lenis = null;
-    };
-  }, []);
-
-  // load products from API when available; fall back to localStorage/defaults
+  // Load the public catalog from the store API; default products stay as a fallback.
   useEffect(() => {
     let cancelled = false;
-    async function load() {
-      async function tryFetch(path, opts) {
-        try {
-          const r = await fetch(path, opts);
-          if (!r.ok) throw new Error("no api");
-          return r;
-        } catch (e) {
-          try {
-            const alt = "http://localhost:4000" + path;
-            const r2 = await fetch(alt, opts);
-            if (!r2.ok) throw new Error("no api");
-            return r2;
-          } catch (e2) {
-            throw e2;
-          }
-        }
-      }
 
+    async function load() {
       try {
-        const res = await tryFetch("/api/products");
-        const data = await res.json();
-        if (!cancelled && Array.isArray(data) && data.length > 0)
-          setProductList(data);
+        const data = await fetchProducts();
+
+        if (!cancelled && Array.isArray(data)) {
+          setProductList(data.map(normalizeProductImages));
+        }
       } catch (e) {
         // keep existing productList (localStorage/defaults)
       }
     }
+
     load();
+
     return () => {
       cancelled = true;
     };
@@ -251,7 +257,10 @@ export default function App() {
     } catch (e) {}
 
     setCart([]);
-    window.__lastOrderId = finalId;
+    setLastOrderId(finalId);
+    try {
+      window.__lastOrderId = finalId;
+    } catch (e) {}
     setCheckoutOpen(false);
     setOrderConfirm({ id: finalId, total: totalAmount });
   }
@@ -269,15 +278,12 @@ export default function App() {
       <main className="container full-width">
         {view === "home" && (
           <Home
-            products={
-              category === "All"
-                ? productList
-                : productList.filter((p) => p.category === category)
-            }
+            products={visibleProducts}
             onView={openProduct}
             onAdd={addToCart}
             category={category}
             onCategoryChange={(c) => setCategory(c)}
+            categories={categories}
           />
         )}
         {view === "product" && selected && (
@@ -356,7 +362,7 @@ export default function App() {
               <h2 style={{ margin: "0 0 6px" }}>Order Placed!</h2>
               <p style={{ color: "var(--muted)", margin: "0 0 20px" }}>
                 Your payment of{" "}
-                <strong>${orderConfirm.total.toFixed(2)}</strong> was
+                <strong>₵{orderConfirm.total.toFixed(2)}</strong> was
                 successful. Save your order code to track your delivery.
               </p>
               <div
@@ -420,7 +426,7 @@ export default function App() {
             </div>
           </div>
         )}
-        {view === "tracker" && <OrderTracker orderId={window.__lastOrderId} />}
+        {view === "tracker" && <OrderTracker orderId={lastOrderId} />}
         {view === "admin-login" && (
           <AdminLogin
             onSuccess={() => {

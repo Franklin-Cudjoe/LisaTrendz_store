@@ -28,7 +28,7 @@ Docker
 Build and run:
 
 ```bash
-npm run docker:build
+docker build -t lizzy-store .
 docker run -p 4000:4000 lizzy-store
 ```
 

@@ -1,611 +1,782 @@
-﻿import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import "../styles/admin.css";
+import { PRODUCT_CATEGORIES } from "../data/categories.js";
 import defaultProducts from "../data/products.js";
-import AdminLogin from "./AdminLogin.jsx";
+import {
+  createProduct,
+  deleteProduct,
+  fetchOrders,
+  fetchProducts,
+  updateOrderStatus,
+  updateProduct,
+  uploadProductImage,
+} from "../services/storeApi.js";
+import {
+  getProductImages,
+  normalizeProductImages,
+} from "../utils/productImages.js";
+
+const EMPTY_PRODUCT_FORM = {
+  name: "",
+  price: "",
+  category: "Dresses",
+  image: "",
+  imageFront: "",
+  imageBack: "",
+  description: "",
+  active: true,
+};
+
+const STATUS_OPTIONS = [
+  "Placed",
+  "Confirmed",
+  "Packed",
+  "Shipped",
+  "Out For Delivery",
+  "Delivered",
+  "Cancelled",
+  "Returned",
+  "Delivery Failed",
+];
+
+function formatMoney(value) {
+  return `GHS ${Number(value || 0).toFixed(2)}`;
+}
+
+function makeProductId() {
+  return "P-" + Math.random().toString(36).slice(2, 9).toUpperCase();
+}
+
+function cleanText(value) {
+  return typeof value === "string" ? value.trim() : "";
+}
+
+function getCategoryOptions(items, currentCategory) {
+  const seen = new Set();
+
+  return [
+    ...PRODUCT_CATEGORIES,
+    currentCategory,
+    ...items.map((item) => item.category),
+  ]
+    .filter((category) => typeof category === "string" && category.trim())
+    .reduce((options, category) => {
+      const clean = category.trim();
+      const key = clean.toLowerCase();
+
+      if (seen.has(key)) return options;
+
+      seen.add(key);
+      return [...options, clean];
+    }, []);
+}
+
+function productFromForm(form, id) {
+  const imageFront = form.imageFront || form.image || "";
+  const imageBack = form.imageBack || "";
+
+  return normalizeProductImages({
+    id,
+    name: cleanText(form.name),
+    price: Number(form.price),
+    category: cleanText(form.category) || "Dresses",
+    image: imageFront,
+    imageFront,
+    imageBack,
+    description: cleanText(form.description),
+    active: form.active !== false,
+  });
+}
+
+function formFromProduct(product) {
+  const images = getProductImages(product);
+
+  return {
+    name: product.name || "",
+    price: product.price ?? "",
+    category: product.category || "Dresses",
+    image: images.front,
+    imageFront: images.front,
+    imageBack: images.back,
+    description: product.description || "",
+    active: product.active !== false,
+  };
+}
+
+function PhotoPicker({ id, label, image, uploading, onFile, onClear }) {
+  return (
+    <div className="owner-photo-field">
+      <div className="owner-photo-preview">
+        {image ? (
+          <img src={image} alt={`${label} preview`} />
+        ) : (
+          <span>{label}</span>
+        )}
+      </div>
+      <div className="owner-photo-actions">
+        <label className="owner-photo-button" htmlFor={id}>
+          {uploading ? "Uploading..." : image ? "Replace photo" : "Upload photo"}
+        </label>
+        <input
+          id={id}
+          type="file"
+          accept="image/*"
+          onChange={(event) => onFile(event.target.files?.[0] || null)}
+        />
+        {image && (
+          <button className="owner-link-button" type="button" onClick={onClear}>
+            Remove
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
 
 export default function Admin({ onChange, onLogout }) {
-  const [adminAuth, setAdminAuth] = useState(() => {
-    try {
-      return sessionStorage.getItem("adminAuth") === "true";
-    } catch (e) {
-      return false;
-    }
-  });
   const [items, setItems] = useState([]);
   const [itemsLoaded, setItemsLoaded] = useState(false);
-  const [editing, setEditing] = useState(null);
+  const [activeTab, setActiveTab] = useState("add");
+  const [editingId, setEditingId] = useState(null);
+  const [form, setForm] = useState(EMPTY_PRODUCT_FORM);
   const [query, setQuery] = useState("");
-  const [form, setForm] = useState({
-    name: "",
-    price: 0,
-    category: "Tops",
-    image: "",
-    description: "",
-  });
-  const [activeMenu, setActiveMenu] = useState("products");
+  const [visibilityFilter, setVisibilityFilter] = useState("all");
+  const [notice, setNotice] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [busyProductId, setBusyProductId] = useState("");
+  const [uploadingImages, setUploadingImages] = useState({});
+  const [storageState, setStorageState] = useState("loading");
   const [ordersList, setOrdersList] = useState([]);
   const [orderQuery, setOrderQuery] = useState("");
   const [orderStatusFilter, setOrderStatusFilter] = useState("");
-  const [orderSort, setOrderSort] = useState("newest");
-
-  const STATUS_OPTIONS = [
-    "Placed",
-    "Confirmed",
-    "Packed",
-    "Shipped",
-    "Out For Delivery",
-    "Delivered",
-    "Cancelled",
-    "Returned",
-    "Delivery Failed",
-  ];
-
-  async function tryFetch(path, opts) {
-    let token;
-    try {
-      token = sessionStorage.getItem("adminAuthToken");
-    } catch (e) {}
-    const authHeaders = token ? { Authorization: `Basic ${token}` } : {};
-    const mergedOpts = opts
-      ? { ...opts, headers: { ...authHeaders, ...(opts.headers || {}) } }
-      : { headers: authHeaders };
-    try {
-      const r = await fetch(path, mergedOpts);
-      if (!r.ok) throw new Error("no api");
-      return r;
-    } catch (e) {
-      try {
-        const r2 = await fetch("http://localhost:4000" + path, mergedOpts);
-        if (!r2.ok) throw new Error("no api");
-        return r2;
-      } catch (e2) {
-        return null;
-      }
-    }
-  }
 
   useEffect(() => {
     async function loadProducts() {
       try {
-        const res = await tryFetch("/api/products");
-        if (res) {
-          setItems(await res.json());
-          setItemsLoaded(true);
-          return;
-        }
-      } catch (e) {}
-      const raw = localStorage.getItem("products");
-      if (raw) {
+        const products = await fetchProducts({ includeHidden: true });
+        setItems(products.map(normalizeProductImages));
+        setStorageState("ready");
+      } catch (e) {
+        setStorageState("offline");
+
         try {
-          const parsed = JSON.parse(raw);
-          if (Array.isArray(parsed) && parsed.length > 0) {
-            setItems(parsed);
-            setItemsLoaded(true);
-            return;
+          const raw = localStorage.getItem("products");
+          const parsed = raw ? JSON.parse(raw) : null;
+
+          if (Array.isArray(parsed)) {
+            setItems(parsed.map(normalizeProductImages));
+          } else {
+            setItems(defaultProducts.map(normalizeProductImages));
           }
-        } catch (e) {}
+        } catch (error) {
+          setItems(defaultProducts.map(normalizeProductImages));
+        }
+      } finally {
+        setItemsLoaded(true);
       }
-      setItems(defaultProducts);
-      setItemsLoaded(true);
     }
+
     loadProducts();
   }, []);
 
   useEffect(() => {
     if (!itemsLoaded) return;
-    localStorage.setItem("products", JSON.stringify(items));
-    if (onChange) onChange(items);
+
+    try {
+      localStorage.setItem("products", JSON.stringify(items));
+    } catch (e) {}
+
+    if (onChange) onChange(items.map(normalizeProductImages));
   }, [items, itemsLoaded]);
 
   useEffect(() => {
-    async function loadOrders() {
-      try {
-        const res = await tryFetch("/api/orders");
-        if (res) {
-          setOrdersList(await res.json());
-          return;
-        }
-      } catch (e) {}
-      setOrdersList([]);
-    }
-    loadOrders();
+    refreshOrders();
   }, []);
 
-  const displayedOrders = ordersList
-    .filter((o) => {
-      if (orderQuery) {
-        const q = orderQuery.toLowerCase();
-        if (
-          !(
-            (o.id || "").toLowerCase().includes(q) ||
-            (o.userId || "").toLowerCase().includes(q)
-          )
-        )
-          return false;
-      }
-      if (orderStatusFilter && (o.currentStatus || "") !== orderStatusFilter)
-        return false;
-      return true;
-    })
-    .slice()
-    .sort((a, b) => {
-      const ta = a.createdAt || a.created || 0;
-      const tb = b.createdAt || b.created || 0;
-      return orderSort === "newest" ? tb - ta : ta - tb;
+  const categoryOptions = useMemo(
+    () => getCategoryOptions(items, form.category),
+    [items, form.category],
+  );
+
+  const visibleCount = items.filter((item) => item.active !== false).length;
+  const hiddenCount = items.length - visibleCount;
+  const recentOrders = ordersList.filter(
+    (order) => (order.currentStatus || "Placed") !== "Delivered",
+  ).length;
+
+  const filteredItems = useMemo(() => {
+    const search = query.trim().toLowerCase();
+
+    return items.filter((item) => {
+      if (visibilityFilter === "visible" && item.active === false) return false;
+      if (visibilityFilter === "hidden" && item.active !== false) return false;
+
+      if (!search) return true;
+
+      return [item.name, item.category, item.description]
+        .filter(Boolean)
+        .some((value) => value.toLowerCase().includes(search));
     });
+  }, [items, query, visibilityFilter]);
+
+  const displayedOrders = useMemo(() => {
+    const search = orderQuery.trim().toLowerCase();
+
+    return ordersList
+      .filter((order) => {
+        if (
+          search &&
+          ![order.id, order.userId, order.email]
+            .filter(Boolean)
+            .some((value) => String(value).toLowerCase().includes(search))
+        ) {
+          return false;
+        }
+
+        if (
+          orderStatusFilter &&
+          (order.currentStatus || "Placed") !== orderStatusFilter
+        ) {
+          return false;
+        }
+
+        return true;
+      })
+      .slice()
+      .sort(
+        (a, b) =>
+          (b.createdAt || b.created || 0) - (a.createdAt || a.created || 0),
+      );
+  }, [ordersList, orderQuery, orderStatusFilter]);
+
+  async function refreshProducts() {
+    try {
+      const products = await fetchProducts({ includeHidden: true });
+      setItems(products.map(normalizeProductImages));
+      setStorageState("ready");
+      setNotice("Catalog refreshed.");
+    } catch (e) {
+      setStorageState("offline");
+      setNotice("Catalog storage is offline. Saved changes need the store server.");
+    }
+  }
+
+  async function refreshOrders() {
+    try {
+      setOrdersList(await fetchOrders());
+    } catch (e) {
+      setOrdersList([]);
+    }
+  }
+
+  function resetForm() {
+    setEditingId(null);
+    setForm(EMPTY_PRODUCT_FORM);
+  }
 
   function startAdd() {
-    setEditing(null);
-    setForm({
-      name: "",
-      price: 0,
-      category: "Tops",
-      image: "",
-      description: "",
-    });
-    setActiveMenu("add");
+    resetForm();
+    setNotice("");
+    setActiveTab("add");
   }
 
-  function saveNew() {
-    const id = "P-" + Math.random().toString(36).slice(2, 9).toUpperCase();
-    setItems((s) => [{ ...form, id, price: Number(form.price) }, ...s]);
-    setForm({
-      name: "",
-      price: 0,
-      category: "Tops",
-      image: "",
-      description: "",
-    });
-    setActiveMenu("products");
+  function startEdit(product) {
+    setEditingId(product.id);
+    setForm(formFromProduct(product));
+    setNotice("");
+    setActiveTab("add");
   }
 
-  function startEdit(item) {
-    setEditing(item.id);
-    setForm({
-      name: item.name,
-      price: item.price,
-      category: item.category,
-      image: item.image,
-      description: item.description,
-    });
+  function updateForm(field, value) {
+    setForm((current) => ({
+      ...current,
+      [field]: value,
+      ...(field === "imageFront" ? { image: value } : {}),
+    }));
   }
 
-  function saveEdit(id) {
-    setItems((s) =>
-      s.map((it) =>
-        it.id === id ? { ...it, ...form, price: Number(form.price) } : it,
+  async function handlePhoto(field, file) {
+    if (!file) return;
+
+    setNotice("");
+    setUploadingImages((current) => ({ ...current, [field]: true }));
+
+    try {
+      const imageUrl = await uploadProductImage(
+        file,
+        field === "imageBack" ? "back" : "front",
+      );
+      updateForm(field, imageUrl);
+      setStorageState("ready");
+    } catch (e) {
+      setStorageState("offline");
+      setNotice(e.message || "Photo upload failed.");
+    } finally {
+      setUploadingImages((current) => ({ ...current, [field]: false }));
+    }
+  }
+
+  async function saveProduct() {
+    const id = editingId || makeProductId();
+    const product = productFromForm(form, id);
+
+    if (!product.name || product.price <= 0 || !product.imageFront) {
+      setNotice("Name, price, and front photo are required.");
+      return;
+    }
+
+    setSaving(true);
+    setNotice("");
+
+    try {
+      const saved = editingId
+        ? await updateProduct(editingId, product)
+        : await createProduct(product);
+      const normalized = normalizeProductImages(saved);
+
+      setItems((current) =>
+        editingId
+          ? current.map((item) => (item.id === editingId ? normalized : item))
+          : [normalized, ...current],
+      );
+      resetForm();
+      setActiveTab("dresses");
+      setStorageState("ready");
+      setNotice(editingId ? "Dress updated." : "Dress published.");
+    } catch (e) {
+      setStorageState("offline");
+      setNotice(e.message || "The dress could not be saved.");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function toggleVisibility(product) {
+    const nextActive = product.active === false;
+    const nextProduct = { ...product, active: nextActive };
+
+    setBusyProductId(product.id);
+    setNotice("");
+
+    try {
+      const saved = await updateProduct(product.id, nextProduct);
+      const normalized = normalizeProductImages(saved);
+
+      setItems((current) =>
+        current.map((item) => (item.id === product.id ? normalized : item)),
+      );
+      setStorageState("ready");
+      setNotice(nextActive ? "Dress is visible in the shop." : "Dress is hidden.");
+    } catch (e) {
+      setStorageState("offline");
+      setNotice(e.message || "Visibility could not be changed.");
+    } finally {
+      setBusyProductId("");
+    }
+  }
+
+  async function removeProduct(product) {
+    if (!confirm(`Delete ${product.name || "this dress"} from the catalog?`)) {
+      return;
+    }
+
+    setBusyProductId(product.id);
+    setNotice("");
+
+    try {
+      await deleteProduct(product.id);
+      setItems((current) => current.filter((item) => item.id !== product.id));
+      setStorageState("ready");
+      setNotice("Dress deleted.");
+    } catch (e) {
+      setStorageState("offline");
+      setNotice(e.message || "The dress could not be deleted.");
+    } finally {
+      setBusyProductId("");
+    }
+  }
+
+  async function changeOrderStatus(orderId, status) {
+    setOrdersList((current) =>
+      current.map((order) =>
+        order.id === orderId ? { ...order, currentStatus: status } : order,
       ),
     );
-    setEditing(null);
+
+    try {
+      await updateOrderStatus(orderId, status);
+    } catch (e) {
+      setNotice(e.message || "Order status could not be saved.");
+    }
   }
 
-  function remove(id) {
-    if (!confirm("Remove product?")) return;
-    setItems((s) => s.filter((it) => it.id !== id));
-  }
-
-  function changeOrderStatus(orderId, newStatus) {
-    setOrdersList((s) =>
-      s.map((it) =>
-        it.id === orderId ? { ...it, currentStatus: newStatus } : it,
-      ),
-    );
-    (async () => {
-      try {
-        await tryFetch(`/api/orders/${orderId}/status`, {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ status: newStatus, actor: "admin" }),
-        });
-      } catch (e) {}
-    })();
-  }
-
-  if (!adminAuth) {
+  function renderCatalogList() {
     return (
-      <div className="admin container">
-        <AdminLogin
-          onSuccess={() => setAdminAuth(true)}
-          onCancel={() => {
-            if (onLogout) onLogout();
-            else {
-              try {
-                sessionStorage.removeItem("adminAuth");
-              } catch (e) {}
-              window.location.href = "/";
-            }
-          }}
-        />
-      </div>
+      <section className="owner-panel">
+        <div className="owner-panel-heading">
+          <div>
+            <span className="owner-kicker">Shop Catalog</span>
+            <h3>Dresses</h3>
+          </div>
+          <button className="btn" type="button" onClick={startAdd}>
+            Add Dress
+          </button>
+        </div>
+
+        <div className="owner-toolbar">
+          <input
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+            placeholder="Search dresses"
+          />
+          <select
+            value={visibilityFilter}
+            onChange={(event) => setVisibilityFilter(event.target.value)}
+          >
+            <option value="all">All dresses</option>
+            <option value="visible">Visible only</option>
+            <option value="hidden">Hidden only</option>
+          </select>
+          <button
+            className="btn secondary"
+            type="button"
+            onClick={refreshProducts}
+          >
+            Refresh
+          </button>
+        </div>
+
+        <div className="owner-catalog-list">
+          {filteredItems.length === 0 && (
+            <div className="owner-empty-state">No dresses match this view.</div>
+          )}
+
+          {filteredItems.map((item) => {
+            const images = getProductImages(item);
+            const isBusy = busyProductId === item.id;
+
+            return (
+              <article className="owner-product-row" key={item.id}>
+                <div className="owner-product-thumb">
+                  {images.front ? (
+                    <img src={images.front} alt={item.name} />
+                  ) : (
+                    <span>{(item.name || "DR").slice(0, 2).toUpperCase()}</span>
+                  )}
+                </div>
+                <div className="owner-product-main">
+                  <div className="owner-product-title-row">
+                    <h4>{item.name || "Untitled dress"}</h4>
+                    <span
+                      className={
+                        "owner-status-pill" +
+                        (item.active === false ? " hidden" : "")
+                      }
+                    >
+                      {item.active === false ? "Hidden" : "Visible"}
+                    </span>
+                  </div>
+                  <p>
+                    {item.category || "Dresses"} / {formatMoney(item.price)}
+                  </p>
+                  {item.description && <p>{item.description}</p>}
+                </div>
+                <div className="owner-row-actions">
+                  <button
+                    className="btn secondary"
+                    type="button"
+                    onClick={() => startEdit(item)}
+                  >
+                    Edit
+                  </button>
+                  <button
+                    className="btn secondary"
+                    type="button"
+                    disabled={isBusy}
+                    onClick={() => toggleVisibility(item)}
+                  >
+                    {item.active === false ? "Show" : "Hide"}
+                  </button>
+                  <button
+                    className="owner-danger-button"
+                    type="button"
+                    disabled={isBusy}
+                    onClick={() => removeProduct(item)}
+                  >
+                    Delete
+                  </button>
+                </div>
+              </article>
+            );
+          })}
+        </div>
+      </section>
+    );
+  }
+
+  function renderProductForm() {
+    const formImages = getProductImages(form);
+
+    return (
+      <section className="owner-panel">
+        <div className="owner-panel-heading">
+          <div>
+            <span className="owner-kicker">
+              {editingId ? "Edit Dress" : "New Dress"}
+            </span>
+            <h3>{editingId ? "Update shop item" : "Add a dress"}</h3>
+          </div>
+          {editingId && (
+            <button className="btn secondary" type="button" onClick={startAdd}>
+              Add New
+            </button>
+          )}
+        </div>
+
+        <div className="owner-form-grid">
+          <div className="owner-photo-grid">
+            <PhotoPicker
+              id="front-photo"
+              label="Front photo"
+              image={formImages.front}
+              uploading={uploadingImages.imageFront}
+              onFile={(file) => handlePhoto("imageFront", file)}
+              onClear={() => updateForm("imageFront", "")}
+            />
+            <PhotoPicker
+              id="back-photo"
+              label="Back photo"
+              image={formImages.back}
+              uploading={uploadingImages.imageBack}
+              onFile={(file) => handlePhoto("imageBack", file)}
+              onClear={() => updateForm("imageBack", "")}
+            />
+          </div>
+
+          <div className="owner-fields">
+            <label>
+              Dress name
+              <input
+                value={form.name}
+                onChange={(event) => updateForm("name", event.target.value)}
+                placeholder="Classic wrap dress"
+              />
+            </label>
+            <div className="owner-two-fields">
+              <label>
+                Price
+                <input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={form.price}
+                  onChange={(event) => updateForm("price", event.target.value)}
+                  placeholder="59.99"
+                />
+              </label>
+              <label>
+                Category
+                <select
+                  value={form.category}
+                  onChange={(event) => updateForm("category", event.target.value)}
+                >
+                  {categoryOptions.map((category) => (
+                    <option key={category} value={category}>
+                      {category}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
+            <label>
+              Short description
+              <textarea
+                value={form.description}
+                onChange={(event) =>
+                  updateForm("description", event.target.value)
+                }
+                rows="4"
+                placeholder="Light fabric, easy fit, perfect for weekend events."
+              />
+            </label>
+            <label className="owner-toggle-row">
+              <input
+                type="checkbox"
+                checked={form.active !== false}
+                onChange={(event) => updateForm("active", event.target.checked)}
+              />
+              Visible in shop
+            </label>
+            <div className="owner-form-actions">
+              <button
+                className="btn"
+                type="button"
+                disabled={saving}
+                onClick={saveProduct}
+              >
+                {saving
+                  ? "Saving..."
+                  : editingId
+                    ? "Save Dress"
+                    : form.active === false
+                      ? "Save Hidden"
+                      : "Publish Dress"}
+              </button>
+              <button
+                className="btn secondary"
+                type="button"
+                disabled={saving}
+                onClick={resetForm}
+              >
+                Clear
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  function renderOrders() {
+    return (
+      <section className="owner-panel">
+        <div className="owner-panel-heading">
+          <div>
+            <span className="owner-kicker">Customer Orders</span>
+            <h3>Orders</h3>
+          </div>
+          <button className="btn secondary" type="button" onClick={refreshOrders}>
+            Refresh
+          </button>
+        </div>
+
+        <div className="owner-toolbar">
+          <input
+            value={orderQuery}
+            onChange={(event) => setOrderQuery(event.target.value)}
+            placeholder="Search orders"
+          />
+          <select
+            value={orderStatusFilter}
+            onChange={(event) => setOrderStatusFilter(event.target.value)}
+          >
+            <option value="">All statuses</option>
+            {STATUS_OPTIONS.map((status) => (
+              <option key={status} value={status}>
+                {status}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="owner-orders-list">
+          {displayedOrders.length === 0 && (
+            <div className="owner-empty-state">No orders found.</div>
+          )}
+
+          {displayedOrders.map((order) => (
+            <article className="owner-order-row" key={order.id}>
+              <div>
+                <div className="owner-order-title">Order {order.id}</div>
+                <p>
+                  {new Date(
+                    order.createdAt || order.created || Date.now(),
+                  ).toLocaleString()}
+                </p>
+                <div className="owner-order-items">
+                  {(order.items || []).map((item, index) => (
+                    <span key={`${order.id}-${index}`}>
+                      {item.name || item.title || "Item"} x{" "}
+                      {item.quantity || item.qty || 1}
+                    </span>
+                  ))}
+                </div>
+              </div>
+              <div className="owner-order-side">
+                <strong>{formatMoney(order.total || order.subtotal)}</strong>
+                <select
+                  value={order.currentStatus || "Placed"}
+                  onChange={(event) =>
+                    changeOrderStatus(order.id, event.target.value)
+                  }
+                >
+                  {STATUS_OPTIONS.map((status) => (
+                    <option key={status} value={status}>
+                      {status}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
     );
   }
 
   return (
-    <div className="admin container">
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-        }}
-      >
-        <h2>Admin Dashboard</h2>
-        <button
-          className="btn"
-          onClick={() => {
-            if (onLogout) onLogout();
-            else {
-              sessionStorage.removeItem("adminAuth");
-              window.location.reload();
-            }
-          }}
-        >
-          Logout
+    <div className="admin owner-admin container">
+      <header className="owner-header">
+        <div>
+          <span className="owner-kicker">Owner Studio</span>
+          <h2>Lizzy shop manager</h2>
+          <p>
+            {storageState === "ready"
+              ? "Catalog storage is connected."
+              : storageState === "loading"
+                ? "Opening catalog storage..."
+                : "Catalog storage is offline."}
+          </p>
+        </div>
+        <button className="btn secondary" type="button" onClick={onLogout}>
+          Sign Out
         </button>
-      </div>
+      </header>
 
-      <div style={{ display: "flex", gap: 20, marginTop: 12 }}>
-        <aside
-          style={{
-            width: 220,
-            borderRight: "1px solid #eee",
-            paddingRight: 12,
-          }}
+      <section className="owner-summary" aria-label="Store summary">
+        <div>
+          <strong>{visibleCount}</strong>
+          <span>Visible dresses</span>
+        </div>
+        <div>
+          <strong>{hiddenCount}</strong>
+          <span>Hidden drafts</span>
+        </div>
+        <div>
+          <strong>{recentOrders}</strong>
+          <span>Open orders</span>
+        </div>
+      </section>
+
+      <nav className="owner-tabs" aria-label="Owner sections">
+        <button
+          className={activeTab === "add" ? "active" : ""}
+          type="button"
+          onClick={() => setActiveTab("add")}
         >
-          <h4 style={{ marginTop: 0 }}>Menu</h4>
-          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-            <button
-              className={"btn" + (activeMenu === "products" ? " active" : "")}
-              onClick={() => setActiveMenu("products")}
-            >
-              Manage Products
-            </button>
-            <button
-              className={"btn" + (activeMenu === "orders" ? " active" : "")}
-              onClick={() => setActiveMenu("orders")}
-            >
-              Manage Orders
-            </button>
-            <button className="btn" onClick={() => startAdd()}>
-              Add New Product
-            </button>
-            <button className="btn" onClick={() => setActiveMenu("settings")}>
-              Settings
-            </button>
-          </div>
-        </aside>
+          Add Dress
+        </button>
+        <button
+          className={activeTab === "dresses" ? "active" : ""}
+          type="button"
+          onClick={() => setActiveTab("dresses")}
+        >
+          Dresses
+        </button>
+        <button
+          className={activeTab === "orders" ? "active" : ""}
+          type="button"
+          onClick={() => setActiveTab("orders")}
+        >
+          Orders
+        </button>
+      </nav>
 
-        <main style={{ flex: 1 }}>
-          {(activeMenu === "products" ||
-            activeMenu === "add" ||
-            activeMenu === "settings") && (
-            <>
-              <div className="admin-top" style={{ marginBottom: 12 }}>
-                <div className="stats">
-                  <div className="stat">
-                    <div className="stat-value">{items.length}</div>
-                    <div className="stat-label">Products</div>
-                  </div>
-                  <div className="stat">
-                    <div className="stat-value">{ordersList.length}</div>
-                    <div className="stat-label">Orders</div>
-                  </div>
-                  <div className="stat">
-                    <div className="stat-value">
-                      $
-                      {ordersList
-                        .reduce((s, o) => s + (o.total || 0), 0)
-                        .toFixed(2)}
-                    </div>
-                    <div className="stat-label">Total Sales</div>
-                  </div>
-                </div>
-                <div className="admin-actions">
-                  <input
-                    className="admin-search"
-                    placeholder="Search products..."
-                    value={query}
-                    onChange={(e) => setQuery(e.target.value)}
-                  />
-                </div>
-              </div>
+      {notice && <div className="owner-notice">{notice}</div>}
 
-              <div style={{ marginBottom: 8, display: "flex", gap: 8 }}>
-                <button className="btn" onClick={() => startAdd()}>
-                  Add new product
-                </button>
-                <button
-                  className="btn"
-                  onClick={async () => {
-                    try {
-                      const res = await tryFetch("/api/products");
-                      if (res) setItems(await res.json());
-                    } catch (e) {}
-                  }}
-                >
-                  Refresh
-                </button>
-                <button
-                  className="btn secondary"
-                  onClick={() => setItems(defaultProducts)}
-                >
-                  Reset defaults
-                </button>
-              </div>
-
-              <div className="admin-form" style={{ marginBottom: 18 }}>
-                <label>Name</label>
-                <input
-                  value={form.name}
-                  onChange={(e) => setForm({ ...form, name: e.target.value })}
-                />
-                <label>Price</label>
-                <input
-                  type="number"
-                  value={form.price}
-                  onChange={(e) => setForm({ ...form, price: e.target.value })}
-                />
-                <label>Category</label>
-                <input
-                  value={form.category}
-                  onChange={(e) =>
-                    setForm({ ...form, category: e.target.value })
-                  }
-                />
-                <label>Image URL</label>
-                <input
-                  value={form.image}
-                  onChange={(e) => setForm({ ...form, image: e.target.value })}
-                />
-                <label>Description</label>
-                <input
-                  value={form.description}
-                  onChange={(e) =>
-                    setForm({ ...form, description: e.target.value })
-                  }
-                />
-                <div style={{ marginTop: 8, display: "flex", gap: 8 }}>
-                  {editing ? (
-                    <>
-                      <button className="btn" onClick={() => saveEdit(editing)}>
-                        Save
-                      </button>
-                      <button className="btn" onClick={() => setEditing(null)}>
-                        Cancel
-                      </button>
-                    </>
-                  ) : (
-                    <button className="btn" onClick={() => saveNew()}>
-                      Create
-                    </button>
-                  )}
-                </div>
-              </div>
-
-              <div className="admin-list">
-                {items
-                  .filter(
-                    (it) =>
-                      !query ||
-                      (it.name || "")
-                        .toLowerCase()
-                        .includes(query.toLowerCase()) ||
-                      (it.category || "")
-                        .toLowerCase()
-                        .includes(query.toLowerCase()),
-                  )
-                  .map((it) => (
-                    <div
-                      key={it.id}
-                      className="card"
-                      style={{
-                        padding: 12,
-                        marginBottom: 12,
-                        display: "flex",
-                        gap: 12,
-                        alignItems: "center",
-                      }}
-                    >
-                      <img
-                        src={it.image}
-                        alt={it.name}
-                        style={{
-                          width: 84,
-                          height: 84,
-                          objectFit: "cover",
-                          borderRadius: 8,
-                        }}
-                      />
-                      <div style={{ flex: 1 }}>
-                        <div
-                          style={{
-                            display: "flex",
-                            justifyContent: "space-between",
-                            alignItems: "center",
-                          }}
-                        >
-                          <strong>{it.name}</strong>
-                          <div style={{ display: "flex", gap: 8 }}>
-                            <button
-                              className="btn"
-                              onClick={() => startEdit(it)}
-                            >
-                              Edit
-                            </button>
-                            <button
-                              className="btn secondary"
-                              onClick={() => remove(it.id)}
-                            >
-                              Delete
-                            </button>
-                          </div>
-                        </div>
-                        <div style={{ color: "var(--muted)" }}>
-                          {it.category} &bull; ${it.price}
-                        </div>
-                        <div style={{ fontSize: ".9rem", marginTop: 4 }}>
-                          {it.description}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-              </div>
-            </>
-          )}
-
-          {activeMenu === "orders" && (
-            <div>
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  marginBottom: 12,
-                }}
-              >
-                <h3 style={{ margin: 0 }}>Orders</h3>
-                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                  <span style={{ fontSize: ".9rem", color: "var(--muted)" }}>
-                    {ordersList.length} total
-                  </span>
-                  <button
-                    className="btn"
-                    onClick={async () => {
-                      try {
-                        const res = await tryFetch("/api/orders");
-                        if (res) setOrdersList(await res.json());
-                      } catch (e) {}
-                    }}
-                  >
-                    ↻ Refresh
-                  </button>
-                </div>
-              </div>
-              <div style={{ marginBottom: 12, display: "flex", gap: 8 }}>
-                <input
-                  placeholder="Search by order ID or user..."
-                  value={orderQuery}
-                  onChange={(e) => setOrderQuery(e.target.value)}
-                  style={{ flex: 1, padding: 8 }}
-                />
-                <select
-                  value={orderStatusFilter}
-                  onChange={(e) => setOrderStatusFilter(e.target.value)}
-                >
-                  <option value="">All statuses</option>
-                  {STATUS_OPTIONS.map((s) => (
-                    <option key={s} value={s}>
-                      {s}
-                    </option>
-                  ))}
-                </select>
-                <select
-                  value={orderSort}
-                  onChange={(e) => setOrderSort(e.target.value)}
-                >
-                  <option value="newest">Newest</option>
-                  <option value="oldest">Oldest</option>
-                </select>
-              </div>
-              <div style={{ display: "grid", gap: 12 }}>
-                {displayedOrders.length === 0 && (
-                  <div className="card" style={{ padding: 12 }}>
-                    No orders found.
-                  </div>
-                )}
-                {displayedOrders.map((o) => (
-                  <div key={o.id} className="card" style={{ padding: 12 }}>
-                    <div
-                      style={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "flex-start",
-                      }}
-                    >
-                      <div>
-                        <div style={{ fontWeight: 700, fontSize: "1rem" }}>
-                          Order #{o.id}
-                        </div>
-                        <div
-                          style={{ color: "var(--muted)", fontSize: ".85rem" }}
-                        >
-                          {new Date(
-                            o.createdAt || o.created || Date.now(),
-                          ).toLocaleString()}
-                        </div>
-                        <div
-                          style={{ color: "var(--muted)", fontSize: ".85rem" }}
-                        >
-                          Customer: {o.userId || o.email || "-"}
-                        </div>
-                      </div>
-                      <div style={{ textAlign: "right" }}>
-                        <div style={{ fontWeight: 700 }}>
-                          ${(o.total || o.subtotal || 0).toFixed(2)}
-                        </div>
-                      </div>
-                    </div>
-                    <div style={{ marginTop: 10 }}>
-                      <strong style={{ fontSize: ".9rem" }}>
-                        Items ordered:
-                      </strong>
-                      <div
-                        style={{
-                          display: "flex",
-                          gap: 6,
-                          flexWrap: "wrap",
-                          marginTop: 4,
-                        }}
-                      >
-                        {(o.items || []).map((it, idx) => (
-                          <span
-                            key={idx}
-                            style={{
-                              background: "#f0f0f0",
-                              padding: "4px 8px",
-                              borderRadius: 4,
-                              fontSize: ".85rem",
-                            }}
-                          >
-                            {it.name || it.title || it.id || "item"} &times;{" "}
-                            {it.quantity || 1}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                    <div
-                      style={{
-                        marginTop: 12,
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                      }}
-                    >
-                      <span
-                        style={{ fontWeight: 600, color: "var(--primary)" }}
-                      >
-                        {o.currentStatus || "Placed"}
-                      </span>
-                      <select
-                        value={o.currentStatus || "Placed"}
-                        onChange={(e) =>
-                          changeOrderStatus(o.id, e.target.value)
-                        }
-                      >
-                        {STATUS_OPTIONS.map((s) => (
-                          <option key={s} value={s}>
-                            {s}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-        </main>
-      </div>
+      {activeTab === "add" && renderProductForm()}
+      {activeTab === "dresses" && renderCatalogList()}
+      {activeTab === "orders" && renderOrders()}
     </div>
   );
 }

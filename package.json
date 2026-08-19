@@ -4,21 +4,12 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview",
-    "server": "node server/index.js",
-    "server:stop": "npx kill-port 4000",
-    "server:restart": "npx kill-port 4000 && npm run server",
-    "start:all": "concurrently \"npm:server\" \"npm:dev\"",
-    "start:prod": "node server/index.js",
-    "docker:build": "docker build -t lizzy-store ."
+    "start": "node scripts/start.mjs",
+    "build": "vite build"
   },
   "dependencies": {
-    "@studio-freight/lenis": "^1.0.42",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "concurrently": "^8.0.1"
+    "react-dom": "^18.2.0"
   },
   "devDependencies": {
     "vite": "^5.0.0"

@@ -56,14 +56,14 @@ export default function Checkout({ items, delivery, onBack, onPay }) {
                   >
                     <path
                       d="M3 11h18v7a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-7z"
-                      stroke="#374151"
+                      stroke="#20232a"
                       strokeWidth="1.2"
                       strokeLinecap="round"
                       strokeLinejoin="round"
                     />
                     <path
                       d="M7 11V6a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v5"
-                      stroke="#374151"
+                      stroke="#20232a"
                       strokeWidth="1.2"
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -81,13 +81,13 @@ export default function Checkout({ items, delivery, onBack, onPay }) {
                   >
                     <path
                       d="M3 7h13l4 4v6a1 1 0 0 1-1 1h-1"
-                      stroke="#0f7490"
+                      stroke="#0f766e"
                       strokeWidth="1.2"
                       strokeLinecap="round"
                       strokeLinejoin="round"
                     />
-                    <circle cx="7" cy="18" r="1" fill="#0f7490" />
-                    <circle cx="18" cy="18" r="1" fill="#0f7490" />
+                    <circle cx="7" cy="18" r="1" fill="#0f766e" />
+                    <circle cx="18" cy="18" r="1" fill="#0f766e" />
                   </svg>
                 ) : (
                   <svg
@@ -99,14 +99,14 @@ export default function Checkout({ items, delivery, onBack, onPay }) {
                   >
                     <path
                       d="M2 12c4 0 7-4 10-4s6 4 10 4"
-                      stroke="#7c3aed"
+                      stroke="#6d706b"
                       strokeWidth="1.2"
                       strokeLinecap="round"
                       strokeLinejoin="round"
                     />
                     <path
                       d="M12 2v4"
-                      stroke="#7c3aed"
+                      stroke="#6d706b"
                       strokeWidth="1.2"
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -123,10 +123,10 @@ export default function Checkout({ items, delivery, onBack, onPay }) {
                       : "Ship — Outside Accra"
                   : "Shipping"}
               </span>
-              <strong style={{ marginLeft: 8 }}>${shipping.toFixed(2)}</strong>
+              <strong style={{ marginLeft: 8 }}>₵{shipping.toFixed(2)}</strong>
             </div>
             <button className="btn" onClick={() => onPay()}>
-              Pay ${total.toFixed(2)}
+              Pay ₵{total.toFixed(2)}
             </button>
           </div>
         </div>
@@ -138,19 +138,19 @@ export default function Checkout({ items, delivery, onBack, onPay }) {
               <div>
                 {i.name} × {i.qty}
               </div>
-              <div>${(i.price * i.qty).toFixed(2)}</div>
+              <div>₵{(i.price * i.qty).toFixed(2)}</div>
             </div>
           ))}
           <div className="summary-item">
             <div>Subtotal</div>
-            <div>${subtotal.toFixed(2)}</div>
+            <div>₵{subtotal.toFixed(2)}</div>
           </div>
           <div className="summary-item">
             <div>Shipping</div>
-            <div>${shipping.toFixed(2)}</div>
+            <div>₵{shipping.toFixed(2)}</div>
           </div>
           <div className="summary-total">
-            Total: <strong>${total.toFixed(2)}</strong>
+            Total: <strong>₵{total.toFixed(2)}</strong>
           </div>
         </aside>
       </div>

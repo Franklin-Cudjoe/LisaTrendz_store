@@ -9,7 +9,7 @@ export default function Header({
   onAdmin,
   onTrack,
 }) {
-  const [visible, setVisible] = useState(false);
+  const [visible, setVisible] = useState(true);
   const hideRef = useRef();
 
   useEffect(() => {
@@ -52,7 +52,7 @@ export default function Header({
           <img src={logoSrc} alt="Lizzy" />
         </h1>
         <nav className="nav">
-          <button className="btn" onClick={onTrack} style={{ marginRight: 8 }}>
+          <button className="btn" onClick={onTrack}>
             Track Order
           </button>
           <button className="cart-btn" onClick={onCart} aria-label="Open cart">

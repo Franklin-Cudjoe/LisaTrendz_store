@@ -6,12 +6,15 @@ Getting started
 
 ```bash
 npm install
-npm run dev
+cd server
+npm install
+cd ..
+npm run start
 ```
 
 Files of interest
 
-- `src/App.jsx` — app shell and view state
+- `src/App.jsx` — app layout and view state
 - `src/components/` — UI components (Header, Home, ProductList, ProductCard, ProductPage, Cart)
 - `src/data/products.js` — sample product data
 - `src/styles.css` — global responsive styles

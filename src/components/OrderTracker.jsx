@@ -134,7 +134,7 @@ export default function OrderTracker({ orderId: initialOrderId }) {
               </div>
               <div style={{ textAlign: "right" }}>
                 <div style={{ fontWeight: 700, fontSize: "1.1rem" }}>
-                  ${(order.total || 0).toFixed(2)}
+                  ₵{(order.total || 0).toFixed(2)}
                 </div>
               </div>
             </div>
@@ -152,7 +152,7 @@ export default function OrderTracker({ orderId: initialOrderId }) {
                 <span
                   key={idx}
                   style={{
-                    background: "#f0f0f0",
+                    background: "rgba(32,35,42,.08)",
                     padding: "4px 10px",
                     borderRadius: 20,
                     fontSize: ".82rem",

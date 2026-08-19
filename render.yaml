@@ -1,0 +1,26 @@
+services:
+  - type: web
+    name: lisatrendz-api
+    runtime: node
+    rootDir: server
+    plan: starter
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/health
+    disk:
+      name: lisatrendz-data
+      mountPath: /var/data
+      sizeGB: 1
+    envVars:
+      - key: NODE_VERSION
+        value: 24
+      - key: ADMIN_USER
+        value: owner
+      - key: ADMIN_PASS
+        sync: false
+      - key: ALLOWED_ORIGINS
+        value: https://lisatrendz.com,https://www.lisatrendz.com
+      - key: PRODUCTS_DATA_PATH
+        value: /var/data/products.json
+      - key: UPLOAD_DIR
+        value: /var/data/uploads

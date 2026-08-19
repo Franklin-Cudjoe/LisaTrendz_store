@@ -1,1 +1,27 @@
-<svg xmlns='http://www.w3.org/2000/svg' width='800' height='800' viewBox='0 0 800 800'><rect width='100%' height='100%' fill='#fff7fb'/><text x='50%' y='50%' fill='#8a5fa6' font-size='36' text-anchor='middle' dominant-baseline='middle' font-family='Arial, sans-serif'>Chic Dress</text></svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="800" viewBox="0 0 800 800" role="img" aria-labelledby="title desc">
+  <title id="title">Chic Dress Front</title>
+  <desc id="desc">Front view of a flowy chic dress.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#fdf4ff"/>
+      <stop offset="0.48" stop-color="#edf8ff"/>
+      <stop offset="1" stop-color="#f5ffe4"/>
+    </linearGradient>
+    <linearGradient id="fabric" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#18473f"/>
+      <stop offset="0.56" stop-color="#2d7569"/>
+      <stop offset="1" stop-color="#bfff39"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="800" rx="34" fill="url(#bg)"/>
+  <ellipse cx="400" cy="716" rx="182" ry="28" fill="#0a2420" opacity=".12"/>
+  <path d="M323 126h154l42 116 75 388c3 18-11 35-29 35H236c-19 0-33-17-29-36l74-387 42-116Z" fill="url(#fabric)"/>
+  <path d="M323 126h154l-31 82c-15 39-74 39-90 0l-33-82Z" fill="#fff" opacity=".94"/>
+  <path d="M289 246c42 34 80 48 114 48 35 0 72-16 110-48" fill="none" stroke="#eaffbd" stroke-width="13" stroke-linecap="round" opacity=".86"/>
+  <path d="M323 126c-24 44-44 88-61 132M477 126c24 44 44 88 61 132" fill="none" stroke="#07302a" stroke-width="11" stroke-linecap="round" opacity=".34"/>
+  <path d="M400 284v354" fill="none" stroke="#ffffff" stroke-width="7" stroke-linecap="round" opacity=".34"/>
+  <path d="M253 624c47-26 96-39 147-39s100 13 147 39" fill="none" stroke="#ffffff" stroke-width="11" stroke-linecap="round" opacity=".26"/>
+  <circle cx="400" cy="333" r="7" fill="#eaffbd"/>
+  <circle cx="400" cy="382" r="7" fill="#eaffbd"/>
+  <text x="400" y="740" fill="#0d342f" font-family="Arial, sans-serif" font-size="28" font-weight="700" text-anchor="middle">FRONT</text>
+</svg>

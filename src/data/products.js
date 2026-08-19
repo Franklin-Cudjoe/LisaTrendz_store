@@ -12,6 +12,8 @@ const products = [
     name: "Chic Dress",
     price: 59.99,
     image: "/src/assets/chic-dress.svg",
+    imageFront: "/src/assets/chic-dress.svg",
+    imageBack: "/src/assets/chic-dress-back.svg",
     category: "Dresses",
     description: "Flowy silhouette designed for comfort and style.",
   },
