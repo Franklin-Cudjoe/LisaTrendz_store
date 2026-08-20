@@ -46,3 +46,5 @@ Environment variables
 - PORT — server port (default 4000)
 - ALLOWED_ORIGINS — comma-separated list of CORS origins (optional)
 - NODE_ENV=production to serve built frontend
+- VITE_API_BASE_URL - frontend build-time API origin when the frontend and API are on different domains
+- PUBLIC_API_ORIGIN - server public API origin used when returning uploaded image URLs

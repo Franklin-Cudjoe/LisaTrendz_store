@@ -26,11 +26,21 @@ const DATA_PATH =
 const UPLOAD_DIR = process.env.UPLOAD_DIR || path.join(__dirname, "uploads");
 
 // Middleware
-app.use(helmet());
+app.set("trust proxy", 1);
+app.use(helmet({ crossOriginResourcePolicy: { policy: "cross-origin" } }));
 app.use(compression());
 app.use(bodyParser.json({ limit: "8mb" }));
 app.use(morgan(process.env.NODE_ENV === "production" ? "combined" : "dev"));
-app.use("/uploads", express.static(UPLOAD_DIR, { maxAge: "7d" }));
+app.use(
+  "/uploads",
+  express.static(UPLOAD_DIR, {
+    maxAge: "7d",
+    setHeaders(res) {
+      res.setHeader("Access-Control-Allow-Origin", "*");
+      res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
+    },
+  }),
+);
 
 // CORS: allow same origin by default, but permit origins via env
 const allowed = (process.env.ALLOWED_ORIGINS || "")
@@ -105,6 +115,26 @@ async function writeProductsAtomic(list) {
 
 function cleanString(value, maxLength = 500) {
   return typeof value === "string" ? value.trim().slice(0, maxLength) : "";
+}
+
+function getPublicOrigin(req) {
+  const configuredOrigin = cleanString(process.env.PUBLIC_API_ORIGIN, 300).replace(
+    /\/+$/,
+    "",
+  );
+
+  if (configuredOrigin) return configuredOrigin;
+
+  const forwardedProto = cleanString(req.get("x-forwarded-proto"), 40)
+    .split(",")[0]
+    ?.trim();
+  const forwardedHost = cleanString(req.get("x-forwarded-host"), 300)
+    .split(",")[0]
+    ?.trim();
+  const protocol = forwardedProto || req.protocol || "http";
+  const host = forwardedHost || req.get("host");
+
+  return host ? `${protocol}://${host}` : "";
 }
 
 function cleanPrice(value) {
@@ -303,7 +333,14 @@ app.post("/api/uploads", requireAuth, uploadLimiter, async (req, res) => {
     const storedName = `${Date.now()}-${crypto.randomUUID()}-${safeBase}.${ext}`;
 
     await fs.writeFile(path.join(UPLOAD_DIR, storedName), buffer);
-    res.json({ url: `/uploads/${storedName}` });
+
+    const uploadPath = `/uploads/${storedName}`;
+    const publicOrigin = getPublicOrigin(req);
+
+    res.json({
+      url: publicOrigin ? `${publicOrigin}${uploadPath}` : uploadPath,
+      path: uploadPath,
+    });
   } catch (e) {
     res.status(500).json({ error: "Failed to upload image" });
   }

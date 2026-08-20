@@ -36,6 +36,77 @@ function apiUrls(path) {
   return [path, `${FALLBACK_API_ORIGIN}${path}`];
 }
 
+function getBrowserOrigin() {
+  try {
+    return window.location.origin;
+  } catch (e) {
+    return "";
+  }
+}
+
+function getApiAssetOrigin(responseUrl) {
+  const browserOrigin = getBrowserOrigin();
+
+  if (API_BASE_URL) {
+    try {
+      return new URL(API_BASE_URL, browserOrigin || undefined).origin;
+    } catch (e) {}
+  }
+
+  try {
+    const responseOrigin = new URL(responseUrl).origin;
+
+    if (!browserOrigin || responseOrigin !== browserOrigin) {
+      return responseOrigin;
+    }
+  } catch (e) {}
+
+  return "";
+}
+
+function resolveApiAssetUrl(value, responseUrl) {
+  if (typeof value !== "string") return value;
+
+  const url = value.trim();
+
+  if (!url || /^https?:\/\//i.test(url) || !url.startsWith("/uploads/")) {
+    return url;
+  }
+
+  const apiOrigin = getApiAssetOrigin(responseUrl);
+
+  return apiOrigin ? `${apiOrigin}${url}` : url;
+}
+
+function resolveImageUrls(value, responseUrl) {
+  if (Array.isArray(value)) {
+    return value.map((image) => resolveImageUrls(image, responseUrl));
+  }
+
+  if (value && typeof value === "object") {
+    return Object.fromEntries(
+      Object.entries(value).map(([key, image]) => [
+        key,
+        resolveImageUrls(image, responseUrl),
+      ]),
+    );
+  }
+
+  return resolveApiAssetUrl(value, responseUrl);
+}
+
+function resolveProductImageUrls(product, responseUrl) {
+  if (!product || typeof product !== "object") return product;
+
+  return {
+    ...product,
+    image: resolveApiAssetUrl(product.image, responseUrl),
+    imageFront: resolveApiAssetUrl(product.imageFront, responseUrl),
+    imageBack: resolveApiAssetUrl(product.imageBack, responseUrl),
+    images: resolveImageUrls(product.images, responseUrl),
+  };
+}
+
 async function parseError(response) {
   try {
     const payload = await response.json();
@@ -87,7 +158,9 @@ export async function fetchProducts({ includeHidden = false } = {}) {
   );
 
   const data = await response.json();
-  return Array.isArray(data) ? data : [];
+  return Array.isArray(data)
+    ? data.map((product) => resolveProductImageUrls(product, response.url))
+    : [];
 }
 
 export async function verifyAdminCredentials(username, password) {
@@ -108,7 +181,7 @@ export async function createProduct(product) {
     body: JSON.stringify(product),
   });
 
-  return response.json();
+  return resolveProductImageUrls(await response.json(), response.url);
 }
 
 export async function updateProduct(id, product) {
@@ -119,7 +192,7 @@ export async function updateProduct(id, product) {
     body: JSON.stringify(product),
   });
 
-  return response.json();
+  return resolveProductImageUrls(await response.json(), response.url);
 }
 
 export async function deleteProduct(id) {
@@ -221,17 +294,7 @@ async function compressImageFile(file) {
 }
 
 function resolveUploadedUrl(uploadUrl, responseUrl) {
-  if (!uploadUrl || !uploadUrl.startsWith("/")) return uploadUrl;
-
-  try {
-    const responseOrigin = new URL(responseUrl).origin;
-
-    if (responseOrigin !== window.location.origin) {
-      return responseOrigin + uploadUrl;
-    }
-  } catch (e) {}
-
-  return uploadUrl;
+  return resolveApiAssetUrl(uploadUrl, responseUrl);
 }
 
 export async function uploadProductImage(file, view = "front") {

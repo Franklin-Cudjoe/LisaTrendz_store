@@ -42,3 +42,5 @@ API server (with realtime) running on port 4001
 [2m4:11:05 PM[22m [36m[1m[vite][22m[39m [32mpage reload [39m[2msrc/components/OrderTracker.jsx[22m
 [0mGET /api/products [36m304[0m 2.089 ms - -[0m
 [2m4:11:12 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/styles/tracker.css[22m
+[2m4:22:22 PM[22m [36m[1m[vite][22m[39m [32mpage reload [39m[2msrc/services/storeApi.js[22m
+[2m4:22:36 PM[22m [36m[1m[vite][22m[39m [32mpage reload [39m[2msrc/services/storeApi.js[22m
