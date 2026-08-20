@@ -4,6 +4,8 @@
 .cart-item .meta{min-width:0}
 .cart-item h3{margin:0 0 6px;font-family:Georgia,serif}
 .cart-item p{margin:4px 0;color:var(--muted)}
+.cart-color{display:flex;align-items:center;gap:7px}
+.cart-color span{width:16px;height:16px;border-radius:50%;border:1px solid rgba(32,35,42,.16);box-shadow:0 0 0 2px rgba(255,255,255,.56)}
 .cart-total{margin-top:12px;font-size:1.1rem;background:rgba(255,255,255,.46);border:1px solid var(--line-light);border-radius:8px;padding:12px 14px}
 
 .cart-overlay{position:fixed;inset:0;background:rgba(32,35,42,.38);z-index:80;animation:fadeIn .24s ease;backdrop-filter:blur(8px)}

@@ -1,9 +1,12 @@
 import React from "react";
 import "../styles/product.css";
 import { getProductImages } from "../utils/productImages.js";
+import { colorOptionKey, getProductColors } from "../utils/productColors.js";
 
 export default function ProductCard({ product, onView, onAdd }) {
   const productImages = getProductImages(product);
+  const productColors = getProductColors(product);
+  const visibleColors = productColors.slice(0, 5);
   const categoryKey = product.category || "Collection";
   const initials = product.name
     .split(/\s+/)
@@ -12,15 +15,12 @@ export default function ProductCard({ product, onView, onAdd }) {
     .map((word) => word[0])
     .join("")
     .toUpperCase();
-  const badge =
-    product.price >= 100
-      ? "Premium pick"
-      : product.price < 35
-        ? "Everyday value"
-        : "New arrival";
   const rating = product.price >= 100 ? "4.9" : "4.8";
   const stockLabel = product.price >= 100 ? "Low stock" : "In stock";
-  const swatches = ["#20232a", "#f7f5ef", "#0f766e"];
+  const productForCart =
+    productColors.length > 0
+      ? { ...product, selectedColor: productColors[0] }
+      : product;
 
   function handleImageError(event) {
     event.currentTarget.hidden = true;
@@ -30,7 +30,6 @@ export default function ProductCard({ product, onView, onAdd }) {
   return (
     <article className="card">
       <div className="media">
-        <span className="product-badge">{badge}</span>
         <span className="fallback-mark" aria-hidden>
           {initials}
         </span>
@@ -54,14 +53,25 @@ export default function ProductCard({ product, onView, onAdd }) {
           <span>{stockLabel}</span>
           <span>Ships in 48h</span>
         </div>
-        <div className="product-commerce-row">
-          <div className="swatches" aria-label={`${product.name} colors`}>
-            {swatches.map((color) => (
-              <span key={color} style={{ background: color }} />
-            ))}
+        {productColors.length > 0 && (
+          <div className="product-commerce-row">
+            <div
+              className="swatches"
+              aria-label={`${product.name} available colors`}
+            >
+              {visibleColors.map((color, index) => (
+                <span
+                  key={colorOptionKey(color, index)}
+                  style={{ backgroundColor: color.value }}
+                  title={color.name}
+                />
+              ))}
+            </div>
+            <span className="product-fit">
+              {productColors.length} {productColors.length === 1 ? "color" : "colors"}
+            </span>
           </div>
-          <span className="product-fit">True fit</span>
-        </div>
+        )}
         <p className="price">₵{product.price.toFixed(2)}</p>
         <div className="card-actions">
           <button className="btn secondary" onClick={onView}>
@@ -69,7 +79,7 @@ export default function ProductCard({ product, onView, onAdd }) {
           </button>
           <button
             className="btn"
-            onClick={onAdd}
+            onClick={() => onAdd(productForCart)}
             aria-label={`Add ${product.name} to cart`}
           >
             Add to bag

@@ -8,10 +8,23 @@ import Checkout from "./components/Checkout.jsx";
 import OrderTracker from "./components/OrderTracker.jsx";
 import Admin from "./components/Admin.jsx";
 import AdminLogin from "./components/AdminLogin.jsx";
+import WhatsAppChat from "./components/WhatsAppChat.jsx";
 import defaultProducts from "./data/products.js";
 import { CATEGORY_ALL, DEFAULT_CATEGORIES } from "./data/categories.js";
 import { normalizeProductImages } from "./utils/productImages.js";
+import { normalizeProductColors } from "./utils/productColors.js";
 import { fetchProducts } from "./services/storeApi.js";
+
+function normalizeProduct(product) {
+  return normalizeProductColors(normalizeProductImages(product));
+}
+
+function getCartItemKey(product) {
+  const color = product?.selectedColor;
+  const colorKey = color ? `${color.name || ""}|${color.value || ""}` : "";
+
+  return `${product.id}::${colorKey}`;
+}
 
 function readStoredProducts() {
   try {
@@ -22,7 +35,7 @@ function readStoredProducts() {
 
     const parsed = JSON.parse(raw);
     if (Array.isArray(parsed) && parsed.length > 0) {
-      return parsed.map(normalizeProductImages);
+      return parsed.map(normalizeProduct);
     }
   } catch (e) {}
 
@@ -66,7 +79,7 @@ export default function App() {
   const [lastOrderId, setLastOrderId] = useState(null);
   const [category, setCategory] = useState(CATEGORY_ALL);
   const [productList, setProductList] = useState(
-    () => readStoredProducts() || defaultProducts.map(normalizeProductImages),
+    () => readStoredProducts() || defaultProducts.map(normalizeProduct),
   );
   const [adminAuth, setAdminAuth] = useState(() => {
     try {
@@ -157,7 +170,7 @@ export default function App() {
         const data = await fetchProducts();
 
         if (!cancelled && Array.isArray(data)) {
-          setProductList(data.map(normalizeProductImages));
+          setProductList(data.map(normalizeProduct));
         }
       } catch (e) {
         // keep existing productList (localStorage/defaults)
@@ -178,18 +191,20 @@ export default function App() {
 
   function addToCart(product, qty = 1) {
     setCart((prev) => {
-      const existing = prev.find((i) => i.id === product.id);
+      const cartKey = getCartItemKey(product);
+      const existing = prev.find((i) => (i.cartKey || i.id) === cartKey);
+
       if (existing) {
         return prev.map((i) =>
-          i.id === product.id ? { ...i, qty: i.qty + qty } : i,
+          (i.cartKey || i.id) === cartKey ? { ...i, qty: i.qty + qty } : i,
         );
       }
-      return [...prev, { ...product, qty }];
+      return [...prev, { ...product, cartKey, qty }];
     });
   }
 
-  function removeFromCart(productId) {
-    setCart((prev) => prev.filter((i) => i.id !== productId));
+  function removeFromCart(cartKey) {
+    setCart((prev) => prev.filter((i) => (i.cartKey || i.id) !== cartKey));
   }
 
   function goHome() {
@@ -449,6 +464,7 @@ export default function App() {
           />
         )}
       </main>
+      <WhatsAppChat />
       <Footer />
     </div>
   );

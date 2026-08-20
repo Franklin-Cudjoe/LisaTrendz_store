@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="800" height="800" viewBox="0 0 800 800" role="img" aria-labelledby="title desc">
-  <title id="title">Chic Dress Back</title>
-  <desc id="desc">Back view of a flowy chic dress with zipper detail.</desc>
+  <title id="title">Chic Dress</title>
+  <desc id="desc">Flowy chic dress with zipper detail.</desc>
   <defs>
     <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
       <stop offset="0" stop-color="#edf8ff"/>
@@ -22,5 +22,4 @@
   <path d="M284 250c37 30 75 44 116 44 42 0 80-15 116-44" fill="none" stroke="#d8ff74" stroke-width="13" stroke-linecap="round" opacity=".7"/>
   <path d="M252 624c46-26 95-39 148-39 52 0 101 13 148 39" fill="none" stroke="#ffffff" stroke-width="11" stroke-linecap="round" opacity=".24"/>
   <path d="M321 126c-26 46-46 92-61 137M479 126c26 46 46 92 61 137" fill="none" stroke="#062c27" stroke-width="11" stroke-linecap="round" opacity=".36"/>
-  <text x="400" y="740" fill="#0d342f" font-family="Arial, sans-serif" font-size="28" font-weight="700" text-anchor="middle">BACK</text>
 </svg>

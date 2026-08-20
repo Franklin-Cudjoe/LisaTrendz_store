@@ -134,8 +134,11 @@ export default function Checkout({ items, delivery, onBack, onPay }) {
         <aside className="checkout-summary">
           <h3>Order summary</h3>
           {items.map((i) => (
-            <div key={i.id} className="summary-item">
+            <div key={i.cartKey || i.id} className="summary-item">
               <div>
+                {i.selectedColor && (
+                  <span className="summary-color">{i.selectedColor.name}</span>
+                )}
                 {i.name} × {i.qty}
               </div>
               <div>₵{(i.price * i.qty).toFixed(2)}</div>

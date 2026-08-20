@@ -12,6 +12,8 @@ cd ..
 npm run start
 ```
 
+`npm run start` starts both the backend and the storefront, opens the local site in your browser, and automatically uses the next available local port if `4000` is already busy.
+
 Files of interest
 
 - `src/App.jsx` — app layout and view state

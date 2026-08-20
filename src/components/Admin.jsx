@@ -15,6 +15,12 @@ import {
   getProductImages,
   normalizeProductImages,
 } from "../utils/productImages.js";
+import {
+  colorOptionKey,
+  getProductColors,
+  normalizeColorOption,
+  normalizeProductColors,
+} from "../utils/productColors.js";
 
 const EMPTY_PRODUCT_FORM = {
   name: "",
@@ -23,6 +29,8 @@ const EMPTY_PRODUCT_FORM = {
   image: "",
   imageFront: "",
   imageBack: "",
+  images: [],
+  colors: [],
   description: "",
   active: true,
 };
@@ -51,6 +59,37 @@ function cleanText(value) {
   return typeof value === "string" ? value.trim() : "";
 }
 
+function normalizeProduct(product) {
+  return normalizeProductColors(normalizeProductImages(product));
+}
+
+function photoCountLabel(count) {
+  return `${count} ${count === 1 ? "photo" : "photos"}`;
+}
+
+function applyGalleryImages(current, images) {
+  const galleryImages = getProductImages({ images }).list;
+
+  return {
+    ...current,
+    images: galleryImages,
+    image: galleryImages[0] || "",
+    imageFront: galleryImages[0] || "",
+    imageBack: galleryImages[1] || "",
+  };
+}
+
+function colorCountLabel(count) {
+  return `${count} ${count === 1 ? "color" : "colors"}`;
+}
+
+function applyProductColors(current, colors) {
+  return {
+    ...current,
+    colors: getProductColors({ colors }),
+  };
+}
+
 function getCategoryOptions(items, currentCategory) {
   const seen = new Set();
 
@@ -72,24 +111,30 @@ function getCategoryOptions(items, currentCategory) {
 }
 
 function productFromForm(form, id) {
-  const imageFront = form.imageFront || form.image || "";
-  const imageBack = form.imageBack || "";
+  const galleryImages = getProductImages(form).list;
+  const imageFront = galleryImages[0] || "";
+  const imageBack = galleryImages[1] || "";
 
-  return normalizeProductImages({
-    id,
-    name: cleanText(form.name),
-    price: Number(form.price),
-    category: cleanText(form.category) || "Dresses",
-    image: imageFront,
-    imageFront,
-    imageBack,
-    description: cleanText(form.description),
-    active: form.active !== false,
-  });
+  return normalizeProductColors(
+    normalizeProductImages({
+      id,
+      name: cleanText(form.name),
+      price: Number(form.price),
+      category: cleanText(form.category) || "Dresses",
+      image: imageFront,
+      imageFront,
+      imageBack,
+      images: galleryImages,
+      colors: getProductColors(form),
+      description: cleanText(form.description),
+      active: form.active !== false,
+    }),
+  );
 }
 
 function formFromProduct(product) {
   const images = getProductImages(product);
+  const colors = getProductColors(product);
 
   return {
     name: product.name || "",
@@ -98,37 +143,133 @@ function formFromProduct(product) {
     image: images.front,
     imageFront: images.front,
     imageBack: images.back,
+    images: images.list,
+    colors,
     description: product.description || "",
     active: product.active !== false,
   };
 }
 
-function PhotoPicker({ id, label, image, uploading, onFile, onClear }) {
+function GalleryPhotoManager({
+  images,
+  uploading,
+  onUploadFiles,
+  onRemove,
+  onMakePrimary,
+}) {
+  const count = images.length;
+
   return (
-    <div className="owner-photo-field">
-      <div className="owner-photo-preview">
-        {image ? (
-          <img src={image} alt={`${label} preview`} />
-        ) : (
-          <span>{label}</span>
-        )}
+    <div className="owner-gallery-manager">
+      <div className="owner-gallery-heading">
+        <span>Dress photos</span>
+        <strong>{photoCountLabel(count)}</strong>
       </div>
-      <div className="owner-photo-actions">
-        <label className="owner-photo-button" htmlFor={id}>
-          {uploading ? "Uploading..." : image ? "Replace photo" : "Upload photo"}
+      <div className="owner-gallery-list">
+        {images.map((image, index) => (
+          <figure className="owner-gallery-tile" key={`${image}-${index}`}>
+            <img src={image} alt={`Dress photo ${index + 1}`} />
+            <figcaption>
+              {index === 0 ? "Main photo" : `Photo ${index + 1}`}
+            </figcaption>
+            <div className="owner-gallery-actions">
+              {index > 0 && (
+                <button type="button" onClick={() => onMakePrimary(index)}>
+                  Make Main
+                </button>
+              )}
+              <button type="button" onClick={() => onRemove(index)}>
+                Remove
+              </button>
+            </div>
+          </figure>
+        ))}
+
+        <label
+          className={
+            "owner-gallery-upload" + (uploading ? " is-uploading" : "")
+          }
+          htmlFor="dress-gallery-upload"
+          aria-disabled={uploading}
+        >
+          <span>
+            {uploading
+              ? "Uploading..."
+              : count > 0
+                ? "Add More Photos"
+                : "Add Photos"}
+          </span>
+          <small>{count > 0 ? "Choose more photos" : "Choose photos"}</small>
         </label>
         <input
-          id={id}
+          id="dress-gallery-upload"
           type="file"
           accept="image/*"
-          onChange={(event) => onFile(event.target.files?.[0] || null)}
+          multiple
+          disabled={uploading}
+          onChange={(event) => {
+            onUploadFiles(event.target.files);
+            event.target.value = "";
+          }}
         />
-        {image && (
-          <button className="owner-link-button" type="button" onClick={onClear}>
-            Remove
-          </button>
-        )}
       </div>
+    </div>
+  );
+}
+
+function ColorManager({ colors, onAdd, onRemove }) {
+  const [name, setName] = useState("");
+  const [value, setValue] = useState("#20232a");
+
+  function handleSubmit(event) {
+    event.preventDefault();
+    onAdd({ name, value });
+    setName("");
+  }
+
+  return (
+    <div className="owner-color-manager">
+      <div className="owner-gallery-heading">
+        <span>Available colors</span>
+        <strong>{colorCountLabel(colors.length)}</strong>
+      </div>
+
+      <div className="owner-color-list">
+        {colors.map((color, index) => (
+          <span className="owner-color-pill" key={colorOptionKey(color, index)}>
+            <span
+              className="owner-color-swatch"
+              style={{ backgroundColor: color.value }}
+              aria-hidden="true"
+            />
+            {color.name}
+            <button
+              type="button"
+              onClick={() => onRemove(index)}
+              aria-label={`Remove ${color.name}`}
+            >
+              Remove
+            </button>
+          </span>
+        ))}
+      </div>
+
+      <form className="owner-color-form" onSubmit={handleSubmit}>
+        <input
+          type="color"
+          value={value}
+          onChange={(event) => setValue(event.target.value)}
+          aria-label="Color swatch"
+        />
+        <input
+          value={name}
+          onChange={(event) => setName(event.target.value)}
+          placeholder="Color name"
+        />
+        <button className="btn secondary" type="submit">
+          Add Color
+        </button>
+      </form>
     </div>
   );
 }
@@ -145,6 +286,7 @@ export default function Admin({ onChange, onLogout }) {
   const [saving, setSaving] = useState(false);
   const [busyProductId, setBusyProductId] = useState("");
   const [uploadingImages, setUploadingImages] = useState({});
+  const [uploadMessage, setUploadMessage] = useState("");
   const [storageState, setStorageState] = useState("loading");
   const [ordersList, setOrdersList] = useState([]);
   const [orderQuery, setOrderQuery] = useState("");
@@ -154,7 +296,7 @@ export default function Admin({ onChange, onLogout }) {
     async function loadProducts() {
       try {
         const products = await fetchProducts({ includeHidden: true });
-        setItems(products.map(normalizeProductImages));
+        setItems(products.map(normalizeProduct));
         setStorageState("ready");
       } catch (e) {
         setStorageState("offline");
@@ -164,12 +306,12 @@ export default function Admin({ onChange, onLogout }) {
           const parsed = raw ? JSON.parse(raw) : null;
 
           if (Array.isArray(parsed)) {
-            setItems(parsed.map(normalizeProductImages));
+            setItems(parsed.map(normalizeProduct));
           } else {
-            setItems(defaultProducts.map(normalizeProductImages));
+            setItems(defaultProducts.map(normalizeProduct));
           }
         } catch (error) {
-          setItems(defaultProducts.map(normalizeProductImages));
+          setItems(defaultProducts.map(normalizeProduct));
         }
       } finally {
         setItemsLoaded(true);
@@ -186,7 +328,7 @@ export default function Admin({ onChange, onLogout }) {
       localStorage.setItem("products", JSON.stringify(items));
     } catch (e) {}
 
-    if (onChange) onChange(items.map(normalizeProductImages));
+    if (onChange) onChange(items.map(normalizeProduct));
   }, [items, itemsLoaded]);
 
   useEffect(() => {
@@ -252,7 +394,7 @@ export default function Admin({ onChange, onLogout }) {
   async function refreshProducts() {
     try {
       const products = await fetchProducts({ includeHidden: true });
-      setItems(products.map(normalizeProductImages));
+      setItems(products.map(normalizeProduct));
       setStorageState("ready");
       setNotice("Catalog refreshed.");
     } catch (e) {
@@ -295,24 +437,126 @@ export default function Admin({ onChange, onLogout }) {
     }));
   }
 
-  async function handlePhoto(field, file) {
-    if (!file) return;
+  function updateGalleryImages(images) {
+    setForm((current) => applyGalleryImages(current, images));
+  }
+
+  function appendGalleryImages(images) {
+    setForm((current) =>
+      applyGalleryImages(current, [...getProductImages(current).list, ...images]),
+    );
+  }
+
+  function removeGalleryImage(index) {
+    setForm((current) =>
+      applyGalleryImages(
+        current,
+        getProductImages(current).list.filter(
+          (_, imageIndex) => imageIndex !== index,
+        ),
+      ),
+    );
+  }
+
+  function makePrimaryImage(index) {
+    setForm((current) => {
+      const galleryImages = getProductImages(current).list;
+      const selectedImage = galleryImages[index];
+
+      if (!selectedImage) return current;
+
+      return applyGalleryImages(current, [
+        selectedImage,
+        ...galleryImages.filter((_, imageIndex) => imageIndex !== index),
+      ]);
+    });
+  }
+
+  function addProductColor(color) {
+    const normalized = normalizeColorOption(color);
+
+    if (!normalized) {
+      setNotice("Add a color name first.");
+      return;
+    }
+
+    setForm((current) =>
+      applyProductColors(current, [
+        ...getProductColors(current),
+        normalized,
+      ]),
+    );
+    setNotice("");
+  }
+
+  function removeProductColor(index) {
+    setForm((current) =>
+      applyProductColors(
+        current,
+        getProductColors(current).filter((_, colorIndex) => colorIndex !== index),
+      ),
+    );
+  }
+
+  async function handleGalleryPhotos(fileList) {
+    const files = Array.from(fileList || []);
+
+    if (files.length === 0) return;
 
     setNotice("");
-    setUploadingImages((current) => ({ ...current, [field]: true }));
+    setUploadMessage(
+      files.length === 1 ? "Preparing photo..." : `Preparing ${files.length} photos...`,
+    );
+    setUploadingImages((current) => ({ ...current, gallery: true }));
 
     try {
-      const imageUrl = await uploadProductImage(
-        file,
-        field === "imageBack" ? "back" : "front",
+      let uploadedCount = 0;
+      const failedFiles = [];
+
+      for (const [index, file] of files.entries()) {
+        setUploadMessage(
+          `Reducing and uploading photo ${index + 1} of ${files.length}...`,
+        );
+
+        try {
+          const uploadedUrl = await uploadProductImage(file, "gallery");
+          appendGalleryImages([uploadedUrl]);
+          uploadedCount += 1;
+        } catch (error) {
+          failedFiles.push(file.name || `photo ${index + 1}`);
+        }
+      }
+
+      if (uploadedCount > 0) {
+        setStorageState("ready");
+      }
+
+      if (failedFiles.length > 0) {
+        setNotice(
+          uploadedCount > 0
+            ? `${photoCountLabel(uploadedCount)} added. ${photoCountLabel(
+                failedFiles.length,
+              )} could not upload.`
+            : "Photo upload failed.",
+        );
+      } else {
+        setNotice("");
+      }
+
+      setUploadMessage(
+        uploadedCount === 0
+          ? ""
+          : uploadedCount === 1
+            ? "Photo ready."
+            : `${photoCountLabel(uploadedCount)} ready.`,
       );
-      updateForm(field, imageUrl);
-      setStorageState("ready");
     } catch (e) {
       setStorageState("offline");
       setNotice(e.message || "Photo upload failed.");
+      setUploadMessage("");
     } finally {
-      setUploadingImages((current) => ({ ...current, [field]: false }));
+      setUploadingImages((current) => ({ ...current, gallery: false }));
+      setTimeout(() => setUploadMessage(""), 1800);
     }
   }
 
@@ -320,8 +564,8 @@ export default function Admin({ onChange, onLogout }) {
     const id = editingId || makeProductId();
     const product = productFromForm(form, id);
 
-    if (!product.name || product.price <= 0 || !product.imageFront) {
-      setNotice("Name, price, and front photo are required.");
+    if (!product.name || product.price <= 0 || product.images.length === 0) {
+      setNotice("Name, price, and at least one photo are required.");
       return;
     }
 
@@ -332,7 +576,7 @@ export default function Admin({ onChange, onLogout }) {
       const saved = editingId
         ? await updateProduct(editingId, product)
         : await createProduct(product);
-      const normalized = normalizeProductImages(saved);
+      const normalized = normalizeProduct(saved);
 
       setItems((current) =>
         editingId
@@ -360,7 +604,7 @@ export default function Admin({ onChange, onLogout }) {
 
     try {
       const saved = await updateProduct(product.id, nextProduct);
-      const normalized = normalizeProductImages(saved);
+      const normalized = normalizeProduct(saved);
 
       setItems((current) =>
         current.map((item) => (item.id === product.id ? normalized : item)),
@@ -453,6 +697,7 @@ export default function Admin({ onChange, onLogout }) {
 
           {filteredItems.map((item) => {
             const images = getProductImages(item);
+            const colors = getProductColors(item);
             const isBusy = busyProductId === item.id;
 
             return (
@@ -478,6 +723,14 @@ export default function Admin({ onChange, onLogout }) {
                   </div>
                   <p>
                     {item.category || "Dresses"} / {formatMoney(item.price)}
+                  </p>
+                  <p>
+                    {photoCountLabel(images.count)} in gallery
+                  </p>
+                  <p>
+                    {colors.length > 0
+                      ? `${colorCountLabel(colors.length)} available`
+                      : "No colors set"}
                   </p>
                   {item.description && <p>{item.description}</p>}
                 </div>
@@ -535,22 +788,16 @@ export default function Admin({ onChange, onLogout }) {
 
         <div className="owner-form-grid">
           <div className="owner-photo-grid">
-            <PhotoPicker
-              id="front-photo"
-              label="Front photo"
-              image={formImages.front}
-              uploading={uploadingImages.imageFront}
-              onFile={(file) => handlePhoto("imageFront", file)}
-              onClear={() => updateForm("imageFront", "")}
+            <GalleryPhotoManager
+              images={formImages.list}
+              uploading={uploadingImages.gallery}
+              onUploadFiles={handleGalleryPhotos}
+              onRemove={removeGalleryImage}
+              onMakePrimary={makePrimaryImage}
             />
-            <PhotoPicker
-              id="back-photo"
-              label="Back photo"
-              image={formImages.back}
-              uploading={uploadingImages.imageBack}
-              onFile={(file) => handlePhoto("imageBack", file)}
-              onClear={() => updateForm("imageBack", "")}
-            />
+            {uploadMessage && (
+              <div className="owner-upload-message">{uploadMessage}</div>
+            )}
           </div>
 
           <div className="owner-fields">
@@ -588,6 +835,11 @@ export default function Admin({ onChange, onLogout }) {
                 </select>
               </label>
             </div>
+            <ColorManager
+              colors={getProductColors(form)}
+              onAdd={addProductColor}
+              onRemove={removeProductColor}
+            />
             <label>
               Short description
               <textarea

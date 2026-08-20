@@ -49,6 +49,60 @@
 
 .owner-form-grid{display:grid;grid-template-columns:1fr;gap:16px}
 .owner-photo-grid{display:grid;grid-template-columns:1fr;gap:12px;align-content:start}
+.owner-gallery-manager{grid-column:1/-1}
+.owner-gallery-heading{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px;
+}
+.owner-gallery-heading span{color:var(--accent-dark);font-weight:900}
+.owner-gallery-heading strong{
+  display:inline-flex;align-items:center;min-height:28px;padding:5px 8px;border-radius:8px;
+  background:rgba(255,255,255,.54);border:1px solid var(--line-light);color:var(--muted);font-size:.78rem;
+}
+.owner-gallery-list{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(128px,1fr));gap:10px;
+}
+.owner-gallery-list input{display:none}
+.owner-gallery-tile,.owner-gallery-upload{
+  min-height:178px;border-radius:8px;border:1px solid var(--line-light);background:rgba(255,255,255,.42);overflow:hidden;
+}
+.owner-gallery-tile{position:relative;margin:0}
+.owner-gallery-tile img{width:100%;height:100%;min-height:178px;object-fit:cover;object-position:center;display:block}
+.owner-gallery-tile figcaption{
+  position:absolute;left:8px;top:8px;z-index:2;padding:5px 7px;border-radius:7px;
+  background:rgba(255,255,255,.72);color:var(--ink);font-size:.68rem;font-weight:900;text-transform:uppercase;
+}
+.owner-gallery-actions{
+  position:absolute;left:8px;right:8px;bottom:8px;z-index:2;display:flex;gap:6px;flex-wrap:wrap;
+}
+.owner-gallery-actions button{
+  flex:1 1 auto;min-height:32px;padding:6px 7px;border-radius:7px;border:1px solid rgba(255,255,255,.48);
+  background:rgba(32,35,42,.74);color:#fff;cursor:pointer;font-size:.72rem;font-weight:900;backdrop-filter:blur(14px) saturate(150%);
+}
+.owner-gallery-upload{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;min-height:178px;padding:14px;
+  border:1px dashed rgba(32,35,42,.22);cursor:pointer;text-align:center;color:var(--accent-dark);
+}
+.owner-gallery-upload span{font-weight:900}
+.owner-gallery-upload small{color:var(--muted);font-weight:800}
+.owner-gallery-upload.is-uploading{cursor:wait;opacity:.72}
+.owner-color-manager{
+  display:grid;gap:9px;padding:11px;border:1px solid var(--line-light);border-radius:8px;background:rgba(255,255,255,.38);
+}
+.owner-color-list{display:flex;gap:8px;flex-wrap:wrap}
+.owner-color-pill{
+  display:inline-flex;align-items:center;gap:7px;min-height:34px;padding:6px 7px;border-radius:8px;
+  background:rgba(255,255,255,.56);border:1px solid var(--line-light);color:var(--accent-dark);font-size:.82rem;font-weight:850;
+}
+.owner-color-swatch{
+  width:18px;height:18px;border-radius:50%;border:1px solid rgba(32,35,42,.18);box-shadow:0 0 0 2px rgba(255,255,255,.56);
+}
+.owner-color-pill button{
+  min-height:28px;padding:4px 7px;border-radius:7px;border:1px solid rgba(142,30,30,.18);
+  background:rgba(142,30,30,.08);color:#8e1e1e;cursor:pointer;font-size:.72rem;font-weight:900;
+}
+.owner-color-form{display:grid;grid-template-columns:46px minmax(0,1fr);gap:8px}
+.owner-color-form input[type="color"]{height:42px;min-height:42px;padding:4px;cursor:pointer}
+.owner-color-form .btn{grid-column:1/-1}
 .owner-photo-field{
   display:grid;gap:10px;padding:10px;border:1px solid var(--line-light);border-radius:8px;background:rgba(255,255,255,.38);
 }
@@ -68,6 +122,10 @@
 }
 .owner-link-button{
   padding:0;border:none;background:transparent;color:var(--accent-2);
+}
+.owner-upload-message{
+  grid-column:1/-1;padding:10px 11px;border-radius:8px;border:1px solid rgba(15,118,110,.16);
+  background:rgba(15,118,110,.07);color:var(--accent-dark);font-size:.86rem;font-weight:850;
 }
 
 .owner-fields{display:grid;gap:12px}
@@ -130,6 +188,8 @@
   .owner-summary span{text-align:left}
   .owner-photo-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
   .owner-two-fields{grid-template-columns:160px minmax(0,1fr)}
+  .owner-color-form{grid-template-columns:46px minmax(0,1fr) auto}
+  .owner-color-form .btn{grid-column:auto}
   .owner-toolbar{grid-template-columns:minmax(0,1fr) 170px auto}
   .owner-product-row{grid-template-columns:96px minmax(0,1fr) auto}
   .owner-product-thumb{width:96px;height:120px;aspect-ratio:auto}

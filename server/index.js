@@ -43,8 +43,10 @@ if (allowed.length) {
   app.use(cors());
 }
 
-// Rate limiting for write endpoints
-const writeLimiter = rateLimit({ windowMs: 60 * 1000, max: 30 });
+// Rate limiting for write endpoints. Uploads are authenticated and can happen in
+// large batches, so they get a separate, roomier bucket.
+const writeLimiter = rateLimit({ windowMs: 60 * 1000, max: 60 });
+const uploadLimiter = rateLimit({ windowMs: 60 * 1000, max: 300 });
 
 function requireAuth(req, res, next) {
   const user = basicAuth(req);
@@ -117,15 +119,109 @@ function cleanBoolean(value, fallback = true) {
   return fallback;
 }
 
+function cleanImageValue(value) {
+  if (typeof value === "string") return cleanString(value, 1200);
+  if (value && typeof value === "object") {
+    return cleanString(value.url || value.src || value.image || "", 1200);
+  }
+
+  return "";
+}
+
+function appendImage(list, value) {
+  const url = cleanImageValue(value);
+
+  if (!url || list.includes(url)) return list;
+
+  return [...list, url];
+}
+
+function cleanImageList(input = {}) {
+  let images = [];
+
+  if (Array.isArray(input.images)) {
+    input.images.forEach((image) => {
+      images = appendImage(images, image);
+    });
+  } else if (input.images && typeof input.images === "object") {
+    images = appendImage(images, input.images.front);
+    images = appendImage(images, input.images.back);
+    images = appendImage(images, input.images.main);
+  }
+
+  [
+    input.imageFront,
+    input.frontImage,
+    input.image,
+    input.imageBack,
+    input.backImage,
+  ].forEach((image) => {
+    images = appendImage(images, image);
+  });
+
+  return images;
+}
+
+function cleanColorValue(value) {
+  const color = cleanString(value, 24);
+  return /^#[0-9a-f]{6}$/i.test(color) ? color.toLowerCase() : "";
+}
+
+function cleanColorOption(input, index = 0) {
+  let name = "";
+  let value = "";
+
+  if (typeof input === "string") {
+    const text = cleanString(input, 44);
+    value = cleanColorValue(text);
+    name = value ? `Color ${index + 1}` : text;
+  } else if (input && typeof input === "object") {
+    name = cleanString(input.name || input.label || input.title, 44);
+    value = cleanColorValue(input.value || input.hex || input.color);
+  }
+
+  if (!name && value) {
+    name = `Color ${index + 1}`;
+  }
+
+  if (!name) return null;
+
+  return {
+    name,
+    value: value || "#20232a",
+  };
+}
+
+function cleanColorList(input = {}) {
+  const rawColors = input.colors || input.colours || input.availableColors || [];
+  const colorInput = Array.isArray(rawColors)
+    ? rawColors
+    : typeof rawColors === "string"
+      ? rawColors.split(",")
+      : [];
+  const seen = new Set();
+
+  return colorInput.reduce((list, color, index) => {
+    const clean = cleanColorOption(color, index);
+
+    if (!clean) return list;
+
+    const key = `${clean.name.toLowerCase()}|${clean.value}`;
+    if (seen.has(key)) return list;
+
+    seen.add(key);
+    return [...list, clean];
+  }, []);
+}
+
 function sanitizeProduct(input = {}, existing = {}) {
   const id = cleanString(input.id || existing.id, 80) || crypto.randomUUID();
   const name = cleanString(input.name, 120);
   const category = cleanString(input.category, 80) || "Dresses";
-  const imageFront = cleanString(
-    input.imageFront || input.frontImage || input.image || "",
-    1200,
-  );
-  const imageBack = cleanString(input.imageBack || input.backImage || "", 1200);
+  const images = cleanImageList(input);
+  const imageFront = images[0] || "";
+  const imageBack = images[1] || "";
+  const colors = cleanColorList(input);
   const description = cleanString(input.description, 800);
   const active = cleanBoolean(input.active, existing.active !== false);
   const now = Date.now();
@@ -138,7 +234,9 @@ function sanitizeProduct(input = {}, existing = {}) {
     category,
     image: imageFront,
     imageFront,
-    imageBack: imageBack && imageBack !== imageFront ? imageBack : "",
+    imageBack,
+    images,
+    colors,
     description,
     active,
     createdAt: existing.createdAt || input.createdAt || now,
@@ -168,7 +266,7 @@ app.get("/api/admin/products", requireAuth, async (req, res) => {
   }
 });
 
-app.post("/api/uploads", writeLimiter, requireAuth, async (req, res) => {
+app.post("/api/uploads", requireAuth, uploadLimiter, async (req, res) => {
   try {
     const { dataUrl, filename = "product-image" } = req.body || {};
     const match =
@@ -216,10 +314,10 @@ app.post("/api/products", writeLimiter, requireAuth, async (req, res) => {
     const list = await readProducts();
     const item = sanitizeProduct(req.body || {});
 
-    if (!item.name || !item.imageFront || item.price <= 0) {
+    if (!item.name || item.images.length === 0 || item.price <= 0) {
       return res
         .status(400)
-        .json({ error: "Name, price, and front photo are required" });
+        .json({ error: "Name, price, and at least one photo are required" });
     }
 
     list.unshift(item);
@@ -240,10 +338,10 @@ app.put("/api/products/:id", writeLimiter, requireAuth, async (req, res) => {
 
     const updated = sanitizeProduct({ ...existing, ...(req.body || {}), id }, existing);
 
-    if (!updated.name || !updated.imageFront || updated.price <= 0) {
+    if (!updated.name || updated.images.length === 0 || updated.price <= 0) {
       return res
         .status(400)
-        .json({ error: "Name, price, and front photo are required" });
+        .json({ error: "Name, price, and at least one photo are required" });
     }
 
     const next = list.map((it) => (it.id === id ? updated : it));

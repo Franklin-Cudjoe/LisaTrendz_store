@@ -28,7 +28,7 @@ export default function Home({
       <div className="container post-hero-edit" aria-label="Store highlights">
         {/* <div>
           <span className="eyebrow">CURATED DROP 08</span>
-          <p>New arrivals, cleaner checkout, front and back garment views.</p>
+          <p>New arrivals, cleaner checkout, and easy garment browsing.</p>
         </div> */}
         {/* <div className="post-hero-pills" aria-label="Shopping benefits">
           <span>48h dispatch</span>

@@ -19,8 +19,8 @@
   --primary:var(--accent-2);
   --radius:8px;
   --max-width:1180px;
-  --header-height:74px;
-  --header-height-mobile:64px;
+  --header-height:90px;
+  --header-height-mobile:78px;
 }
 
 html,body{min-height:100%;max-width:100%;overflow-x:hidden;overflow-y:auto}

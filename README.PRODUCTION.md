@@ -16,7 +16,7 @@ cd ..
 2. Build frontend and start server:
 
 ```bash
-npm run build
+npm exec -- vite build
 # set admin credentials via env or use defaults (Franklin/Cudjoe)
 ADMIN_USER=Franklin ADMIN_PASS=Cudjoe NODE_ENV=production node server/index.js
 ```

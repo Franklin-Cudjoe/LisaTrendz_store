@@ -3,6 +3,9 @@ const API_BASE_URL = (import.meta.env?.VITE_API_BASE_URL || "").replace(
   /\/+$/,
   "",
 );
+const MAX_UPLOAD_SIDE = 1800;
+const MAX_UPLOAD_BYTES = 900 * 1024;
+const JPEG_QUALITY_STEPS = [0.82, 0.74, 0.66, 0.58];
 
 class StoreApiError extends Error {
   constructor(message, status = 0) {
@@ -137,6 +140,86 @@ function readFileAsDataUrl(file) {
   });
 }
 
+function canvasToBlob(canvas, type, quality) {
+  return new Promise((resolve, reject) => {
+    canvas.toBlob(
+      (blob) => {
+        if (blob) resolve(blob);
+        else reject(new StoreApiError("Could not prepare the image."));
+      },
+      type,
+      quality,
+    );
+  });
+}
+
+function loadImageFromFile(file) {
+  return new Promise((resolve, reject) => {
+    const image = new Image();
+    const objectUrl = URL.createObjectURL(file);
+
+    image.onload = () => {
+      URL.revokeObjectURL(objectUrl);
+      resolve(image);
+    };
+    image.onerror = () => {
+      URL.revokeObjectURL(objectUrl);
+      reject(new StoreApiError("Could not read the image."));
+    };
+    image.src = objectUrl;
+  });
+}
+
+function makeCompressedName(filename = "dress-photo") {
+  const cleanName = String(filename).replace(/\.[^.]+$/, "") || "dress-photo";
+  return `${cleanName}.jpg`;
+}
+
+async function compressImageFile(file) {
+  if (
+    typeof document === "undefined" ||
+    !file?.type?.startsWith("image/") ||
+    file.type === "image/svg+xml" ||
+    file.type === "image/gif"
+  ) {
+    return file;
+  }
+
+  const image = await loadImageFromFile(file);
+  const scale = Math.min(
+    1,
+    MAX_UPLOAD_SIDE / Math.max(image.naturalWidth, image.naturalHeight),
+  );
+  const width = Math.max(1, Math.round(image.naturalWidth * scale));
+  const height = Math.max(1, Math.round(image.naturalHeight * scale));
+  const canvas = document.createElement("canvas");
+  const context = canvas.getContext("2d", { alpha: false });
+
+  if (!context) return file;
+
+  canvas.width = width;
+  canvas.height = height;
+  context.fillStyle = "#ffffff";
+  context.fillRect(0, 0, width, height);
+  context.drawImage(image, 0, 0, width, height);
+
+  let bestBlob = null;
+
+  for (const quality of JPEG_QUALITY_STEPS) {
+    const blob = await canvasToBlob(canvas, "image/jpeg", quality);
+    bestBlob = blob;
+
+    if (blob.size <= MAX_UPLOAD_BYTES) break;
+  }
+
+  if (!bestBlob || bestBlob.size >= file.size) return file;
+
+  return new File([bestBlob], makeCompressedName(file.name), {
+    type: "image/jpeg",
+    lastModified: Date.now(),
+  });
+}
+
 function resolveUploadedUrl(uploadUrl, responseUrl) {
   if (!uploadUrl || !uploadUrl.startsWith("/")) return uploadUrl;
 
@@ -156,14 +239,15 @@ export async function uploadProductImage(file, view = "front") {
     throw new StoreApiError("Choose an image file.");
   }
 
-  const dataUrl = await readFileAsDataUrl(file);
+  const uploadFile = await compressImageFile(file);
+  const dataUrl = await readFileAsDataUrl(uploadFile);
   const response = await apiRequest("/api/uploads", {
     method: "POST",
     auth: true,
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       dataUrl,
-      filename: file.name || "dress-photo",
+      filename: uploadFile.name || file.name || "dress-photo",
       view,
     }),
   });

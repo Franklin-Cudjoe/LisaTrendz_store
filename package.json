@@ -4,8 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "start": "node scripts/start.mjs",
-    "build": "vite build"
+    "start": "node scripts/start.mjs"
   },
   "dependencies": {
     "react": "^18.2.0",

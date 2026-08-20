@@ -37,8 +37,18 @@
 .hero-spot .btn{font-size:1rem}
 
 @media (max-width:639px){
-  .hero-spot .container{width:min(calc(100vw - 28px),362px);margin:0 14px;padding:84px 0 48px}
-  .hero-left h2{font-size:clamp(2.45rem,11vw,3.25rem);max-width:8.9ch}
+  .hero-spot{min-height:calc(100svh - var(--header-height-mobile));background-position:66% center}
+  .hero-image-layer{object-position:66% center}
+  .hero-spot::after{
+    background:
+      linear-gradient(180deg,rgba(32,35,42,.02) 0%,rgba(32,35,42,.16) 34%,rgba(32,35,42,.72) 82%,rgba(247,245,239,.92) 100%),
+      linear-gradient(90deg,rgba(32,35,42,.9) 0%,rgba(32,35,42,.58) 62%,rgba(32,35,42,.18) 100%);
+  }
+  .hero-spot .container{width:min(calc(100vw - 28px),362px);margin:0 14px;padding:54px 0 34px}
+  .hero-left{max-width:20rem}
+  .hero-left h2{font-size:clamp(2.15rem,11vw,3rem);line-height:.98;max-width:9.2ch;margin-bottom:14px}
+  .hero-actions{max-width:232px;margin-top:18px;gap:8px}
+  .hero-spot .btn{min-height:42px;font-size:.92rem;padding:11px 13px}
 }
 
 @media (min-width:640px){

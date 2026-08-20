@@ -10,7 +10,7 @@ export default function ProductList({ products, onView, onAdd }) {
           key={p.id}
           product={p}
           onView={() => onView(p)}
-          onAdd={() => onAdd(p)}
+          onAdd={(item) => onAdd(item || p)}
         />
       ))}
     </div>

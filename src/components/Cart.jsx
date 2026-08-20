@@ -34,13 +34,25 @@ export default function Cart({
       ) : (
         <div className="cart-list">
           {items.map((i) => (
-            <div className="cart-item" key={i.id}>
+            <div className="cart-item" key={i.cartKey || i.id}>
               <img src={i.image} alt={i.name} />
               <div className="meta">
                 <h3>{i.name}</h3>
+                {i.selectedColor && (
+                  <p className="cart-color">
+                    <span
+                      style={{ backgroundColor: i.selectedColor.value }}
+                      aria-hidden="true"
+                    />
+                    Color: {i.selectedColor.name}
+                  </p>
+                )}
                 <p>Qty: {i.qty}</p>
                 <p>₵{(i.price * i.qty).toFixed(2)}</p>
-                <button className="btn tiny" onClick={() => onRemove(i.id)}>
+                <button
+                  className="btn tiny"
+                  onClick={() => onRemove(i.cartKey || i.id)}
+                >
                   Remove
                 </button>
               </div>
