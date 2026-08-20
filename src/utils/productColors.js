@@ -47,14 +47,14 @@ export function normalizeColorOption(input, index = 0) {
   if (typeof input === "string") {
     const text = cleanText(input);
     value = cleanColorValue(text);
-    name = value ? `Color ${index + 1}` : text;
+    name = value ? `Colour ${index + 1}` : text;
   } else if (input && typeof input === "object") {
     name = cleanText(input.name || input.label || input.title);
     value = cleanColorValue(input.value || input.hex || input.color);
   }
 
   if (!name && value) {
-    name = `Color ${index + 1}`;
+    name = `Colour ${index + 1}`;
   }
 
   if (!name) return null;

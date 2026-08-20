@@ -109,7 +109,7 @@ export default function ProductPage({ product, onAdd, onBack }) {
           <p className="desc">{product.description}</p>
           {productColors.length > 0 && (
             <div className="product-color-section">
-              <div className="product-color-heading">Available colors</div>
+              <div className="product-color-heading">Available colours</div>
               <div className="product-color-options">
                 {productColors.map((color, index) => {
                   const active =

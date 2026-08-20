@@ -80,7 +80,7 @@ function applyGalleryImages(current, images) {
 }
 
 function colorCountLabel(count) {
-  return `${count} ${count === 1 ? "color" : "colors"}`;
+  return `${count} ${count === 1 ? "colour" : "colours"}`;
 }
 
 function applyProductColors(current, colors) {
@@ -230,7 +230,7 @@ function ColorManager({ colors, onAdd, onRemove }) {
   return (
     <div className="owner-color-manager">
       <div className="owner-gallery-heading">
-        <span>Available colors</span>
+        <span>Available colours</span>
         <strong>{colorCountLabel(colors.length)}</strong>
       </div>
 
@@ -246,7 +246,7 @@ function ColorManager({ colors, onAdd, onRemove }) {
             <button
               type="button"
               onClick={() => onRemove(index)}
-              aria-label={`Remove ${color.name}`}
+              aria-label={`Remove ${color.name} colour`}
             >
               Remove
             </button>
@@ -259,15 +259,15 @@ function ColorManager({ colors, onAdd, onRemove }) {
           type="color"
           value={value}
           onChange={(event) => setValue(event.target.value)}
-          aria-label="Color swatch"
+          aria-label="Colour swatch"
         />
         <input
           value={name}
           onChange={(event) => setName(event.target.value)}
-          placeholder="Color name"
+          placeholder="Colour name"
         />
         <button className="btn secondary" type="submit">
-          Add Color
+          Add Colour
         </button>
       </form>
     </div>
@@ -476,7 +476,7 @@ export default function Admin({ onChange, onLogout }) {
     const normalized = normalizeColorOption(color);
 
     if (!normalized) {
-      setNotice("Add a color name first.");
+      setNotice("Add a colour name first.");
       return;
     }
 
@@ -730,7 +730,7 @@ export default function Admin({ onChange, onLogout }) {
                   <p>
                     {colors.length > 0
                       ? `${colorCountLabel(colors.length)} available`
-                      : "No colors set"}
+                      : "No colours set"}
                   </p>
                   {item.description && <p>{item.description}</p>}
                 </div>

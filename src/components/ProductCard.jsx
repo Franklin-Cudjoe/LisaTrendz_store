@@ -57,7 +57,7 @@ export default function ProductCard({ product, onView, onAdd }) {
           <div className="product-commerce-row">
             <div
               className="swatches"
-              aria-label={`${product.name} available colors`}
+              aria-label={`${product.name} available colours`}
             >
               {visibleColors.map((color, index) => (
                 <span
@@ -68,7 +68,7 @@ export default function ProductCard({ product, onView, onAdd }) {
               ))}
             </div>
             <span className="product-fit">
-              {productColors.length} {productColors.length === 1 ? "color" : "colors"}
+              {productColors.length} {productColors.length === 1 ? "colour" : "colours"}
             </span>
           </div>
         )}

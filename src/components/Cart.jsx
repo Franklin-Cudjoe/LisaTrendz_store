@@ -44,7 +44,7 @@ export default function Cart({
                       style={{ backgroundColor: i.selectedColor.value }}
                       aria-hidden="true"
                     />
-                    Color: {i.selectedColor.name}
+                    Colour: {i.selectedColor.name}
                   </p>
                 )}
                 <p>Qty: {i.qty}</p>

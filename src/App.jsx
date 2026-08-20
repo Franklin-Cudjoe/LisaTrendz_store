@@ -70,6 +70,7 @@ function isVisibleProduct(product) {
 
 export default function App() {
   const [view, setView] = useState("home");
+  const [trackerReturnView, setTrackerReturnView] = useState("home");
   const [selected, setSelected] = useState(null);
   const [cart, setCart] = useState([]);
   const [cartOpen, setCartOpen] = useState(false);
@@ -189,6 +190,17 @@ export default function App() {
     setView("product");
   }
 
+  function openTracker() {
+    if (view !== "tracker") {
+      setTrackerReturnView(view);
+    }
+    setView("tracker");
+  }
+
+  function closeTracker() {
+    setView(trackerReturnView || "home");
+  }
+
   function addToCart(product, qty = 1) {
     setCart((prev) => {
       const cartKey = getCartItemKey(product);
@@ -287,7 +299,7 @@ export default function App() {
         onCart={() => setCartOpen(true)}
         onHome={goHome}
         onAdmin={() => setView("admin-login")}
-        onTrack={() => setView("tracker")}
+        onTrack={openTracker}
       />
 
       <main className="container full-width">
@@ -432,7 +444,7 @@ export default function App() {
                   className="btn"
                   onClick={() => {
                     setOrderConfirm(null);
-                    setView("tracker");
+                    openTracker();
                   }}
                 >
                   Track My Order
@@ -441,7 +453,9 @@ export default function App() {
             </div>
           </div>
         )}
-        {view === "tracker" && <OrderTracker orderId={lastOrderId} />}
+        {view === "tracker" && (
+          <OrderTracker orderId={lastOrderId} onBack={closeTracker} />
+        )}
         {view === "admin-login" && (
           <AdminLogin
             onSuccess={() => {

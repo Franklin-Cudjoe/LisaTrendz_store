@@ -12,7 +12,7 @@ const ALL_STATUSES = [
 
 const CANCELLED_STATUSES = ["Cancelled", "Returned", "Delivery Failed"];
 
-export default function OrderTracker({ orderId: initialOrderId }) {
+export default function OrderTracker({ orderId: initialOrderId, onBack }) {
   const [orderId, setOrderId] = useState(initialOrderId || "");
   const [order, setOrder] = useState(null);
   const [history, setHistory] = useState([]);
@@ -88,6 +88,12 @@ export default function OrderTracker({ orderId: initialOrderId }) {
 
   return (
     <div className="tracker" style={{ maxWidth: 640, margin: "0 auto" }}>
+      {onBack && (
+        <button className="back tracker-back" type="button" onClick={onBack}>
+          Back
+        </button>
+      )}
+
       {!initialOrderId && (
         <form
           onSubmit={onSubmit}

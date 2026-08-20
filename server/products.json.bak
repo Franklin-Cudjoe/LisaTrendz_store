@@ -1,12 +1,28 @@
 [
   {
-    "id": "p2",
-    "name": "Chic Dress",
-    "price": 59.99,
-    "image": "/src/assets/chic-dress.svg",
-    "imageFront": "/src/assets/chic-dress.svg",
-    "imageBack": "/src/assets/chic-dress-back.svg",
-    "category": "Dresses",
-    "description": "Flowy silhouette designed for comfort and style."
+    "id": "P-1XNVCRK",
+    "name": "Dress",
+    "price": 100,
+    "category": "Rompers and Jumpsuits",
+    "image": "/uploads/1787238928575-8f454834-db46-4014-928d-30bb556c14a7-img1.jpg",
+    "imageFront": "/uploads/1787238928575-8f454834-db46-4014-928d-30bb556c14a7-img1.jpg",
+    "imageBack": "",
+    "images": [
+      "/uploads/1787238928575-8f454834-db46-4014-928d-30bb556c14a7-img1.jpg"
+    ],
+    "colors": [
+      {
+        "name": "Blue",
+        "value": "#144ed7"
+      },
+      {
+        "name": "White",
+        "value": "#fafafa"
+      }
+    ],
+    "description": "Light Dress",
+    "active": true,
+    "createdAt": 1787238978647,
+    "updatedAt": 1787238978647
   }
 ]

@@ -99,7 +99,7 @@ body{
 
 @media (max-width:520px){
   .app-root{padding-top:var(--header-height-mobile)}
-  .media img,.fallback-mark{height:230px}
+  .media img,.fallback-mark{height:100%}
   .btn{width:100%;padding:12px 14px}
 }
 
