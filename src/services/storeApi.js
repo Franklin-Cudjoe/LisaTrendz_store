@@ -342,3 +342,21 @@ export async function updateOrderStatus(orderId, status) {
 
   return response.json();
 }
+
+export async function initializePaystackPayment(order, customer) {
+  const response = await apiRequest("/api/paystack/initialize", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ order, customer }),
+  });
+
+  return response.json();
+}
+
+export async function verifyPaystackPayment(reference) {
+  const response = await apiRequest(
+    `/api/paystack/verify/${encodeURIComponent(reference)}`,
+  );
+
+  return response.json();
+}

@@ -1,28 +1,30 @@
 [
   {
-    "id": "P-1XNVCRK",
-    "name": "Dress",
-    "price": 100,
-    "category": "Rompers and Jumpsuits",
-    "image": "/uploads/1787238928575-8f454834-db46-4014-928d-30bb556c14a7-img1.jpg",
-    "imageFront": "/uploads/1787238928575-8f454834-db46-4014-928d-30bb556c14a7-img1.jpg",
+    "id": "P-93OOP9H",
+    "name": "Nmae2",
+    "price": 15,
+    "stock": 5,
+    "category": "Dresses",
+    "image": "/uploads/1787257522955-d47e70c5-2b5c-401f-9a0d-e6eca66a59d0-img1.jpg",
+    "imageFront": "/uploads/1787257522955-d47e70c5-2b5c-401f-9a0d-e6eca66a59d0-img1.jpg",
     "imageBack": "",
-    "images": [
-      "/uploads/1787238928575-8f454834-db46-4014-928d-30bb556c14a7-img1.jpg"
-    ],
-    "colors": [
-      {
-        "name": "Blue",
-        "value": "#144ed7"
-      },
-      {
-        "name": "White",
-        "value": "#fafafa"
-      }
-    ],
-    "description": "Light Dress",
+    "description": "TEST",
     "active": true,
-    "createdAt": 1787238978647,
-    "updatedAt": 1787238978647
+    "createdAt": 1787257540143,
+    "updatedAt": 1787257540143
+  },
+  {
+    "id": "P-THR1OJV",
+    "name": "name",
+    "price": 14,
+    "stock": 2,
+    "category": "Dresses",
+    "image": "/uploads/1787257490819-0f6e39f1-2ccb-4a82-93bd-f0163f4e08dc-img1.jpg",
+    "imageFront": "/uploads/1787257490819-0f6e39f1-2ccb-4a82-93bd-f0163f4e08dc-img1.jpg",
+    "imageBack": "",
+    "description": "fabric",
+    "active": true,
+    "createdAt": 1787257513508,
+    "updatedAt": 1787257513508
   }
 ]

@@ -3,6 +3,7 @@ const products = [
     id: "p1",
     name: "Everyday Tee",
     price: 24.99,
+    stock: 12,
     image: "/src/assets/everyday-tee.svg",
     category: "Tops",
     colors: [
@@ -16,6 +17,7 @@ const products = [
     id: "p2",
     name: "Chic Dress",
     price: 59.99,
+    stock: 3,
     image: "/src/assets/chic-dress.svg",
     imageFront: "/src/assets/chic-dress.svg",
     imageBack: "/src/assets/chic-dress-back.svg",
@@ -31,6 +33,7 @@ const products = [
     id: "p3",
     name: "Denim Jacket",
     price: 89.99,
+    stock: 6,
     image: "/src/assets/denim-jacket.svg",
     category: "Tops",
     colors: [
@@ -43,6 +46,7 @@ const products = [
     id: "p4",
     name: "Comfort Joggers",
     price: 39.99,
+    stock: 0,
     image: "/src/assets/comfort-joggers.svg",
     category: "Leggings",
     colors: [
@@ -55,6 +59,7 @@ const products = [
     id: "p5",
     name: "Lightweight Hoodie",
     price: 49.99,
+    stock: 8,
     image: "/src/assets/lightweight-hoodie.svg",
     category: "Seamless set",
     colors: [
@@ -67,6 +72,7 @@ const products = [
     id: "p6",
     name: "Summer Shorts",
     price: 29.99,
+    stock: 2,
     image: "/src/assets/summer-shorts.svg",
     category: "Shorts",
     colors: [

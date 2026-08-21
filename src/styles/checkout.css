@@ -8,13 +8,24 @@
 .checkout-form label{font-weight:850;font-size:.82rem;color:var(--accent-dark)}
 .checkout-form input{width:100%;padding:13px 12px;margin:7px 0 14px;border-radius:8px;border:1px solid rgba(32,35,42,.12);background:rgba(255,255,255,.52);box-shadow:inset 0 1px 0 rgba(255,255,255,.62)}
 .checkout-form input:focus{outline:3px solid rgba(15,118,110,.16);border-color:rgba(15,118,110,.42)}
+.checkout-form .btn{width:100%;justify-content:center;margin-top:12px}
+.checkout-form .btn:disabled{opacity:.62;cursor:not-allowed;transform:none}
+.checkout-section-heading{display:grid;gap:3px;margin-bottom:14px}
+.checkout-section-heading span{font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--accent-dark);font-weight:900}
+.checkout-section-heading h3{margin:0;font-size:1.18rem}
 .checkout-summary{order:-1}
 .checkout-summary h3{font-family:Georgia,serif;margin:0 0 12px}
 .summary-item{display:flex;justify-content:space-between;padding:7px 0;gap:12px;color:var(--muted)}
+.summary-item.discount{color:var(--accent-2);font-weight:900}
 .summary-color{display:block;color:var(--accent-dark);font-size:.78rem;font-weight:850;margin-bottom:3px}
 .summary-total{margin-top:12px;border-top:1px solid rgba(32,35,42,.12);padding-top:12px;font-size:1.14rem}
 .note{font-size:0.9rem;color:var(--muted);margin:8px 0}
-.delivery-summary{background:rgba(255,255,255,.42);border:1px solid var(--line-light);border-radius:8px;padding:10px 12px}
+.delivery-summary{display:flex;justify-content:space-between;gap:12px;background:rgba(255,255,255,.42);border:1px solid var(--line-light);border-radius:8px;padding:10px 12px}
+.paystack-method-grid{display:grid;grid-template-columns:1fr;gap:10px;margin:4px 0 12px}
+.paystack-method-grid div{border:1px solid var(--line-light);border-radius:8px;padding:12px;background:rgba(255,255,255,.5)}
+.paystack-method-grid span{display:block;color:var(--accent-dark);font-size:.78rem;font-weight:900;margin-bottom:3px}
+.paystack-method-grid strong{display:block;font-size:.9rem;color:var(--ink)}
+.checkout-error{margin:12px 0 0;padding:10px 12px;border-radius:8px;background:rgba(142,30,30,.08);border:1px solid rgba(142,30,30,.18);color:#8e1e1e;font-size:.9rem;font-weight:800}
 
 .checkout-modal-overlay{position:fixed;inset:0;background:rgba(32,35,42,.44);z-index:120;display:flex;align-items:end;justify-content:center;padding:12px;backdrop-filter:blur(10px)}
 .checkout-modal{width:min(1000px,100%);max-height:92vh;overflow:auto;border-radius:8px;background:linear-gradient(155deg,rgba(255,255,255,.78),rgba(241,240,234,.62));box-shadow:0 30px 80px rgba(32,35,42,.24);padding:16px;border:1px solid var(--line-light);backdrop-filter:blur(28px) saturate(160%)}
@@ -22,5 +33,6 @@
 @media (min-width:760px){
   .checkout-grid{grid-template-columns:1fr 320px;gap:18px}
   .checkout-summary{order:initial}
+  .paystack-method-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
   .checkout-modal-overlay{align-items:center;padding:20px}
 }

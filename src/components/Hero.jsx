@@ -13,12 +13,11 @@ export default function Hero({ onShop, onExplore }) {
       <img className="hero-image-layer" src={heroImage} alt="" aria-hidden />
       <div className="container hero-inner">
         <div className="hero-left">
-          <span className="hero-kicker">LIZZY RESERVE</span>
+          <span className="hero-kicker">LisaTrendz</span>
           <h2>Everyday pieces with storefront energy.</h2>
-          {/* <p className="lead">
-            A liquid-glass storefront shaped for fast mobile browsing, premium
-            product signals, and a cleaner path to checkout.
-          </p> */}
+          <p className="lead">
+            Fresh fits, bold colour, and easy pieces curated for everyday style.
+          </p>
           <div className="hero-actions">
             <button className="btn" onClick={onShop}>
               Shop New

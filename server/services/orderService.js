@@ -6,6 +6,8 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DATA_FILE = path.join(__dirname, "..", "orders.json");
 
 const ALLOWED_TRANSITIONS = {
+  "Payment Pending": ["Placed", "Payment Review", "Cancelled"],
+  "Payment Review": ["Placed", "Cancelled"],
   Placed: ["Confirmed", "Cancelled"],
   Confirmed: ["Packed", "Cancelled"],
   Packed: ["Shipped", "Cancelled"],
@@ -42,6 +44,12 @@ class OrderService {
     return Date.now();
   }
 
+  _number(value, fallback = 0) {
+    const parsed = Number(value);
+
+    return Number.isFinite(parsed) ? parsed : fallback;
+  }
+
   async createOrder(data = {}) {
     await this._ensureLoaded();
     const id =
@@ -50,14 +58,40 @@ class OrderService {
         ? crypto.randomUUID()
         : `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`);
     const now = this._now();
+    const createdAt = data.createdAt || now;
+    const items = Array.isArray(data.items) ? data.items : [];
+    const itemCount =
+      data.itemCount ||
+      items.reduce(
+        (total, item) => total + this._number(item.quantity ?? item.qty, 1),
+        0,
+      );
+    const itemSummary =
+      data.itemSummary ||
+      items
+        .map((item) => `${item.name || item.id || "Item"} x ${item.quantity || item.qty || 1}`)
+        .join(", ");
     const order = {
       id,
+      orderCode: data.orderCode || id,
       userId: data.userId || null,
-      items: data.items || [],
-      total: data.total || 0,
-      currency: data.currency || "USD",
+      customer: data.customer || null,
+      email: data.email || data.customer?.email || null,
+      phone: data.phone || data.customer?.phone || null,
+      items,
+      itemCount,
+      itemSummary,
+      subtotal: this._number(data.subtotal),
+      shipping: this._number(data.shipping),
+      discount: data.discount || { subtotalDiscount: 0, shippingDiscount: 0, totalDiscount: 0 },
+      promotion: data.promotion || null,
+      delivery: data.delivery || null,
+      total: this._number(data.total),
+      amountPaid: this._number(data.amountPaid, this._number(data.total)),
+      currency: data.currency || "GHS",
+      payment: data.payment || null,
       currentStatus: data.currentStatus || "Placed",
-      createdAt: now,
+      createdAt,
       updatedAt: now,
       eta: data.eta || null,
       trackingNumber: data.trackingNumber || null,
@@ -79,6 +113,18 @@ class OrderService {
   async getOrder(id) {
     await this._ensureLoaded();
     return this._data.orders.find((o) => o.id === id) || null;
+  }
+
+  async updateOrder(orderId, patch = {}) {
+    await this._ensureLoaded();
+
+    const order = await this.getOrder(orderId);
+
+    if (!order) throw new Error("Order not found");
+
+    Object.assign(order, patch, { id: order.id, updatedAt: this._now() });
+    await this._write();
+    return order;
   }
 
   async getHistory(orderId) {

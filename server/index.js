@@ -6,6 +6,7 @@ import crypto from "crypto";
 import { fileURLToPath } from "url";
 import { Server as IOServer } from "socket.io";
 import orderService from "./services/orderService.js";
+import paymentService from "./services/paymentService.js";
 import cors from "cors";
 import bodyParser from "body-parser";
 import basicAuth from "basic-auth";
@@ -15,21 +16,32 @@ import rateLimit from "express-rate-limit";
 import dotenv from "dotenv";
 import morgan from "morgan";
 
-dotenv.config();
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const PROJECT_ROOT = path.join(__dirname, "..");
+
+dotenv.config({ path: path.join(PROJECT_ROOT, ".env") });
+dotenv.config({ path: path.join(__dirname, ".env") });
 
 const app = express();
 const PORT = process.env.PORT || 4000;
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const PROJECT_ROOT = path.join(__dirname, "..");
 const DATA_PATH =
   process.env.PRODUCTS_DATA_PATH || path.join(__dirname, "products.json");
 const UPLOAD_DIR = process.env.UPLOAD_DIR || path.join(__dirname, "uploads");
+const PAYSTACK_API_BASE = "https://api.paystack.co";
+const PAYSTACK_DEFAULT_CHANNELS = ["card", "mobile_money"];
 
 // Middleware
 app.set("trust proxy", 1);
 app.use(helmet({ crossOriginResourcePolicy: { policy: "cross-origin" } }));
 app.use(compression());
-app.use(bodyParser.json({ limit: "8mb" }));
+app.use(
+  bodyParser.json({
+    limit: "8mb",
+    verify(req, res, buffer) {
+      req.rawBody = buffer;
+    },
+  }),
+);
 app.use(morgan(process.env.NODE_ENV === "production" ? "combined" : "dev"));
 app.use(
   "/uploads",
@@ -140,6 +152,14 @@ function getPublicOrigin(req) {
 function cleanPrice(value) {
   const parsed = Number(value);
   return Number.isFinite(parsed) && parsed >= 0 ? parsed : 0;
+}
+
+function cleanStock(value, fallback = null) {
+  if (value === "" || value == null) return fallback;
+
+  const parsed = Number(value);
+
+  return Number.isFinite(parsed) && parsed >= 0 ? Math.floor(parsed) : fallback;
 }
 
 function cleanBoolean(value, fallback = true) {
@@ -254,6 +274,7 @@ function sanitizeProduct(input = {}, existing = {}) {
   const colors = cleanColorList(input);
   const description = cleanString(input.description, 800);
   const active = cleanBoolean(input.active, existing.active !== false);
+  const stock = cleanStock(input.stock, existing.stock ?? null);
   const now = Date.now();
 
   return {
@@ -261,6 +282,7 @@ function sanitizeProduct(input = {}, existing = {}) {
     id,
     name,
     price: cleanPrice(input.price),
+    stock,
     category,
     image: imageFront,
     imageFront,
@@ -274,8 +296,729 @@ function sanitizeProduct(input = {}, existing = {}) {
   };
 }
 
+function getOrderItemQuantity(item = {}) {
+  const quantity = Number(item.quantity ?? item.qty ?? 1);
+
+  return Number.isFinite(quantity) && quantity > 0 ? Math.ceil(quantity) : 1;
+}
+
+async function reserveOrderStock(items = []) {
+  const productItems = Array.isArray(items) ? items : [];
+  if (productItems.length === 0) return;
+
+  const list = await readProducts();
+  let changed = false;
+
+  const next = list.map((product) => {
+    const stock = cleanStock(product.stock, null);
+    if (stock == null) return product;
+
+    const requested = productItems.reduce((total, item) => {
+      if (item.id !== product.id) return total;
+      return total + getOrderItemQuantity(item);
+    }, 0);
+
+    if (requested <= 0) return product;
+
+    if (stock < requested) {
+      const label = product.name || product.id || "Item";
+      const error = new Error(`${label} has only ${stock} left.`);
+      error.status = 409;
+      throw error;
+    }
+
+    changed = true;
+    return {
+      ...product,
+      stock: stock - requested,
+      updatedAt: Date.now(),
+    };
+  });
+
+  if (changed) {
+    await writeProductsAtomic(next);
+  }
+}
+
+const SERVER_PROMO_CODES = {
+  LISA10: { code: "LISA10", type: "percent", value: 10, minSubtotal: 0 },
+  TREND20: { code: "TREND20", type: "amount", value: 20, minSubtotal: 150 },
+  FREESHIP: { code: "FREESHIP", type: "shipping", value: 0, minSubtotal: 0 },
+};
+
+function createHttpError(message, status = 400) {
+  const error = new Error(message);
+  error.status = status;
+  return error;
+}
+
+function cleanEmail(value) {
+  const email = cleanString(value, 180).toLowerCase();
+
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ? email : "";
+}
+
+function cleanPaystackReference(value) {
+  return cleanString(value, 80).replace(/[^A-Za-z0-9._=-]/g, "");
+}
+
+function cleanPhone(value) {
+  return cleanString(value, 40).replace(/[^\d+()\-\s]/g, "");
+}
+
+function cleanSelectedColor(value) {
+  if (!value || typeof value !== "object") return null;
+
+  const name = cleanString(value.name || value.label || value.title, 44);
+  const colorValue = cleanColorValue(value.value || value.hex || value.color);
+
+  if (!name && !colorValue) return null;
+
+  return {
+    name: name || "Selected colour",
+    value: colorValue || "#20232a",
+  };
+}
+
+function sanitizeCustomer(input = {}) {
+  const name = cleanString(input.name, 120);
+  const email = cleanEmail(input.email);
+  const phone = cleanPhone(input.phone);
+
+  if (!email) {
+    throw createHttpError("Enter a valid email address for Paystack.", 400);
+  }
+
+  return {
+    name: name || email.split("@")[0],
+    email,
+    phone,
+  };
+}
+
+function normalizePromoCode(value) {
+  return cleanString(value, 40).toUpperCase().replace(/\s+/g, "");
+}
+
+function findServerPromo(promotion) {
+  const code = normalizePromoCode(
+    typeof promotion === "string" ? promotion : promotion?.code,
+  );
+
+  return code ? SERVER_PROMO_CODES[code] || null : null;
+}
+
+function calculateServerPromoDiscount(promotion, subtotal, shipping) {
+  const promo = findServerPromo(promotion);
+
+  if (!promo || subtotal < Number(promo.minSubtotal || 0)) {
+    return {
+      promo: null,
+      discount: { subtotalDiscount: 0, shippingDiscount: 0, totalDiscount: 0 },
+    };
+  }
+
+  let subtotalDiscount = 0;
+  let shippingDiscount = 0;
+
+  if (promo.type === "percent") {
+    subtotalDiscount = subtotal * (Number(promo.value || 0) / 100);
+  } else if (promo.type === "amount") {
+    subtotalDiscount = Number(promo.value || 0);
+  } else if (promo.type === "shipping") {
+    shippingDiscount = shipping;
+  }
+
+  subtotalDiscount = Math.min(subtotal, Math.max(0, subtotalDiscount));
+  shippingDiscount = Math.min(shipping, Math.max(0, shippingDiscount));
+
+  return {
+    promo,
+    discount: {
+      subtotalDiscount,
+      shippingDiscount,
+      totalDiscount: subtotalDiscount + shippingDiscount,
+    },
+  };
+}
+
+function normalizeDelivery(input = {}) {
+  if (input?.type === "ship" && input?.method === "within") {
+    return { type: "ship", method: "within", cost: 50 };
+  }
+
+  if (input?.type === "ship" && input?.method === "outside") {
+    return { type: "ship", method: "outside", cost: 100 };
+  }
+
+  return { type: "pickup", cost: 0 };
+}
+
+function toPaystackSubunit(amount) {
+  const parsed = Number(amount);
+
+  if (!Number.isFinite(parsed) || parsed <= 0) return 0;
+
+  return Math.round(parsed * 100);
+}
+
+function fromPaystackSubunit(amount) {
+  return Math.round(Number(amount || 0)) / 100;
+}
+
+function getPaystackSecret() {
+  return cleanString(process.env.PAYSTACK_SECRET_KEY, 300);
+}
+
+function getPaystackCurrency() {
+  return cleanString(process.env.PAYSTACK_CURRENCY || "GHS", 8).toUpperCase();
+}
+
+function getPaystackChannels() {
+  const allowed = new Set([
+    "card",
+    "bank",
+    "ussd",
+    "qr",
+    "mobile_money",
+    "bank_transfer",
+    "eft",
+  ]);
+  const channels = cleanString(process.env.PAYSTACK_CHANNELS, 200)
+    .split(",")
+    .map((channel) => channel.trim())
+    .filter((channel) => allowed.has(channel));
+
+  return channels.length > 0 ? channels : PAYSTACK_DEFAULT_CHANNELS;
+}
+
+function getFrontendOrigin(req) {
+  const configured = cleanString(process.env.PUBLIC_SITE_ORIGIN, 300).replace(
+    /\/+$/,
+    "",
+  );
+
+  if (configured) return configured;
+
+  const requestOrigin = cleanString(req.get("origin"), 300).replace(/\/+$/, "");
+
+  if (requestOrigin) return requestOrigin;
+
+  const referer = cleanString(req.get("referer"), 500);
+
+  try {
+    if (referer) return new URL(referer).origin;
+  } catch (e) {}
+
+  return getPublicOrigin(req);
+}
+
+function buildPaystackCallbackUrl(req) {
+  const origin = getFrontendOrigin(req);
+
+  return origin ? `${origin}/?payment=paystack` : undefined;
+}
+
+async function makeUniqueOrderCode() {
+  for (let attempt = 0; attempt < 6; attempt += 1) {
+    const code = `ORD-${crypto.randomBytes(4).toString("hex").toUpperCase()}`;
+    const existingOrder = await orderService.getOrder(code);
+    const existingPayment = await paymentService.get(code);
+
+    if (!existingOrder && !existingPayment) return code;
+  }
+
+  throw createHttpError("Could not generate an order code.", 500);
+}
+
+async function paystackRequest(endpoint, { method = "GET", body } = {}) {
+  const secret = getPaystackSecret();
+
+  if (!secret) {
+    throw createHttpError("Paystack is not configured yet.", 503);
+  }
+
+  if (typeof fetch !== "function") {
+    throw createHttpError("This server needs Node 18+ for Paystack payments.", 500);
+  }
+
+  const response = await fetch(`${PAYSTACK_API_BASE}${endpoint}`, {
+    method,
+    headers: {
+      Authorization: `Bearer ${secret}`,
+      "Content-Type": "application/json",
+    },
+    body: body ? JSON.stringify(body) : undefined,
+  });
+  let payload = null;
+
+  try {
+    payload = await response.json();
+  } catch (e) {}
+
+  if (!response.ok || payload?.status === false) {
+    throw createHttpError(
+      payload?.message || "Paystack request failed.",
+      response.status || 502,
+    );
+  }
+
+  return payload;
+}
+
+async function buildPaystackOrderPayload(input = {}, reference, customer) {
+  const sourceItems = Array.isArray(input.items) ? input.items : [];
+
+  if (sourceItems.length === 0) {
+    throw createHttpError("Your cart is empty.", 400);
+  }
+
+  const catalog = await readProducts();
+  const catalogById = new Map(
+    catalog
+      .filter((product) => product && product.active !== false)
+      .map((product) => [product.id, product]),
+  );
+
+  const items = sourceItems.map((item) => {
+    const productId = cleanString(item.productId || item.id, 80);
+    const product = catalogById.get(productId);
+
+    if (!product) {
+      throw createHttpError("One of the items is no longer available.", 400);
+    }
+
+    const quantity = getOrderItemQuantity(item);
+    const stock = cleanStock(product.stock, null);
+
+    if (stock != null && stock < quantity) {
+      throw createHttpError(`${product.name} has only ${stock} left.`, 409);
+    }
+
+    const unitPrice = cleanPrice(product.price);
+    const images = cleanImageList(product);
+
+    return {
+      id: product.id,
+      productId: product.id,
+      name: cleanString(product.name, 120) || "Item",
+      category: cleanString(product.category, 80) || "Collection",
+      description: cleanString(product.description, 800),
+      image: product.image || product.imageFront || images[0] || "",
+      selectedColor: cleanSelectedColor(item.selectedColor),
+      selectedSize: cleanString(item.selectedSize, 16),
+      quantity,
+      qty: quantity,
+      unitPrice,
+      price: unitPrice,
+      lineTotal: unitPrice * quantity,
+    };
+  });
+
+  const delivery = normalizeDelivery(input.delivery);
+  const subtotal = items.reduce((total, item) => total + item.lineTotal, 0);
+  const shipping = delivery.cost;
+  const promoResult = calculateServerPromoDiscount(
+    input.promotion,
+    subtotal,
+    shipping,
+  );
+  const total = Math.max(
+    0,
+    subtotal + shipping - promoResult.discount.totalDiscount,
+  );
+  const currency = getPaystackCurrency();
+
+  if (total <= 0) {
+    throw createHttpError("The order total must be greater than zero.", 400);
+  }
+
+  return {
+    id: reference,
+    orderCode: reference,
+    userId: null,
+    customer,
+    email: customer.email,
+    phone: customer.phone,
+    items,
+    itemCount: items.reduce((count, item) => count + item.quantity, 0),
+    itemSummary: items
+      .map((item) => `${item.name} x ${item.quantity}`)
+      .join(", "),
+    subtotal,
+    shipping,
+    discount: promoResult.discount,
+    promotion: promoResult.promo
+      ? { code: promoResult.promo.code, type: promoResult.promo.type }
+      : null,
+    delivery,
+    total,
+    amountPaid: 0,
+    currency,
+    currentStatus: "Payment Pending",
+    payment: {
+      provider: "paystack",
+      reference,
+      status: "initialized",
+      channels: getPaystackChannels(),
+    },
+    metadata: {
+      paystackReference: reference,
+      paymentProvider: "paystack",
+    },
+    createdAt: Date.now(),
+  };
+}
+
+function getPaystackChannel(data = {}) {
+  return (
+    data.channel ||
+    data.authorization?.channel ||
+    data.authorization?.card_type ||
+    ""
+  );
+}
+
+function getPaystackPaymentMethod(data = {}) {
+  const channel = getPaystackChannel(data);
+  const bank = data.authorization?.bank;
+  const brand = data.authorization?.brand || data.authorization?.card_type;
+
+  if (channel === "card" && brand) return `${brand} card`;
+  if (channel === "mobile_money" && bank) return `Mobile money - ${bank}`;
+  if (channel) return channel.replace(/_/g, " ");
+
+  return "Paystack";
+}
+
+async function updateOrderPayment(orderId, paymentPatch = {}) {
+  const current = await orderService.getOrder(orderId);
+
+  if (!current) return null;
+
+  return orderService.updateOrder(orderId, {
+    amountPaid:
+      paymentPatch.status === "success"
+        ? Number(paymentPatch.amount || current.total || 0)
+        : current.amountPaid || 0,
+    payment: {
+      ...(current.payment || {}),
+      ...paymentPatch,
+    },
+    metadata: {
+      ...(current.metadata || {}),
+      paystackReference: paymentPatch.reference || current.payment?.reference,
+      paymentProvider: "paystack",
+    },
+  });
+}
+
+async function completePaystackPayment(reference, { eventData = null } = {}) {
+  const cleanReference = cleanPaystackReference(reference);
+
+  if (!cleanReference) {
+    throw createHttpError("Missing Paystack reference.", 400);
+  }
+
+  const payment = await paymentService.get(cleanReference);
+
+  if (!payment) {
+    throw createHttpError("Payment reference not found.", 404);
+  }
+
+  const verified = eventData
+    ? { data: eventData }
+    : await paystackRequest(
+        `/transaction/verify/${encodeURIComponent(cleanReference)}`,
+      );
+  const data = verified.data || {};
+  const paystackStatus = cleanString(data.status, 60).toLowerCase();
+  const expectedAmount = Number(payment.expectedAmount || 0);
+  const actualAmount = Number(data.amount || 0);
+  const expectedCurrency = cleanString(payment.currency, 8).toUpperCase();
+  const actualCurrency = cleanString(data.currency, 8).toUpperCase();
+  const order = await orderService.getOrder(payment.orderId || cleanReference);
+
+  if (!order) {
+    throw createHttpError("Order for this payment was not found.", 404);
+  }
+
+  if (
+    paystackStatus !== "success" ||
+    actualAmount !== expectedAmount ||
+    actualCurrency !== expectedCurrency
+  ) {
+    const status =
+      paystackStatus === "failed" || paystackStatus === "abandoned"
+        ? "failed"
+        : "pending";
+
+    const updatedPayment = await paymentService.upsert(cleanReference, {
+      ...payment,
+      status,
+      paystack: data,
+      failureReason:
+        paystackStatus === "success"
+          ? "Amount or currency mismatch"
+          : data.gateway_response || data.message || paystackStatus,
+    });
+    const updatedOrder = await updateOrderPayment(order.id, {
+      provider: "paystack",
+      reference: cleanReference,
+      status,
+      amount: fromPaystackSubunit(actualAmount),
+      currency: actualCurrency || expectedCurrency,
+      channel: getPaystackChannel(data),
+      method: getPaystackPaymentMethod(data),
+      verifiedAt: Date.now(),
+    });
+
+    if (status === "failed" && order.currentStatus === "Payment Pending") {
+      await orderService.changeStatus(
+        order.id,
+        "Cancelled",
+        "paystack",
+        "Payment was not completed.",
+        { force: true, idempotencyKey: `${cleanReference}-failed` },
+      );
+    }
+
+    return {
+      paid: false,
+      status,
+      order: (await orderService.getOrder(order.id)) || updatedOrder,
+      payment: updatedPayment,
+    };
+  }
+
+  let stockReserved = payment.stockReserved === true;
+
+  if (!stockReserved) {
+    try {
+      await reserveOrderStock(order.items || payment.orderPayload?.items || []);
+      stockReserved = true;
+    } catch (e) {
+      const updatedPayment = await paymentService.upsert(cleanReference, {
+        ...payment,
+        status: "paid_stock_review",
+        stockReserved: false,
+        paystack: data,
+        failureReason: e.message,
+      });
+
+      await updateOrderPayment(order.id, {
+        provider: "paystack",
+        reference: cleanReference,
+        status: "paid_stock_review",
+        amount: fromPaystackSubunit(actualAmount),
+        currency: actualCurrency,
+        channel: getPaystackChannel(data),
+        method: getPaystackPaymentMethod(data),
+        verifiedAt: Date.now(),
+      });
+
+      if (order.currentStatus === "Payment Pending") {
+        await orderService.changeStatus(
+          order.id,
+          "Payment Review",
+          "paystack",
+          e.message || "Payment received but stock needs review.",
+          { force: true, idempotencyKey: `${cleanReference}-stock-review` },
+        );
+      }
+
+      return {
+        paid: true,
+        status: "paid_stock_review",
+        order: await orderService.getOrder(order.id),
+        payment: updatedPayment,
+      };
+    }
+  }
+
+  const updatedPayment = await paymentService.upsert(cleanReference, {
+    ...payment,
+    status: "success",
+    stockReserved,
+    paidAt: Date.now(),
+    paystack: data,
+  });
+
+  await updateOrderPayment(order.id, {
+    provider: "paystack",
+    reference: cleanReference,
+    status: "success",
+    amount: fromPaystackSubunit(actualAmount),
+    currency: actualCurrency,
+    channel: getPaystackChannel(data),
+    method: getPaystackPaymentMethod(data),
+    verifiedAt: Date.now(),
+    authorization:
+      data.authorization && typeof data.authorization === "object"
+        ? {
+            authorizationCode: data.authorization.authorization_code,
+            cardType: data.authorization.card_type,
+            last4: data.authorization.last4,
+            bank: data.authorization.bank,
+          }
+        : null,
+  });
+
+  const latestOrder = await orderService.getOrder(order.id);
+
+  if (latestOrder?.currentStatus === "Payment Pending") {
+    await orderService.changeStatus(
+      order.id,
+      "Placed",
+      "paystack",
+      "Payment verified.",
+      { force: true, idempotencyKey: `${cleanReference}-success` },
+    );
+  }
+
+  return {
+    paid: true,
+    status: "success",
+    order: await orderService.getOrder(order.id),
+    payment: updatedPayment,
+  };
+}
+
+function verifyPaystackSignature(req) {
+  const secret = getPaystackSecret();
+  const signature = cleanString(req.get("x-paystack-signature"), 300);
+
+  if (!secret || !signature || !req.rawBody) return false;
+
+  const hash = crypto
+    .createHmac("sha512", secret)
+    .update(req.rawBody)
+    .digest("hex");
+  const hashBuffer = Buffer.from(hash);
+  const signatureBuffer = Buffer.from(signature);
+
+  return (
+    hashBuffer.length === signatureBuffer.length &&
+    crypto.timingSafeEqual(hashBuffer, signatureBuffer)
+  );
+}
+
 app.get("/api/health", (req, res) => {
   res.json({ ok: true });
+});
+
+app.post("/api/paystack/initialize", writeLimiter, async (req, res) => {
+  try {
+    const customer = sanitizeCustomer(req.body?.customer || {});
+    const requestedReference = cleanPaystackReference(
+      req.body?.order?.orderCode || req.body?.order?.id || "",
+    );
+    const reference = requestedReference || (await makeUniqueOrderCode());
+    const orderPayload = await buildPaystackOrderPayload(
+      req.body?.order || {},
+      reference,
+      customer,
+    );
+    const amount = toPaystackSubunit(orderPayload.total);
+    const currency = orderPayload.currency;
+    const callbackUrl = buildPaystackCallbackUrl(req);
+    const channels = getPaystackChannels();
+    const initializePayload = {
+      email: customer.email,
+      amount,
+      currency,
+      reference,
+      channels,
+      metadata: JSON.stringify({
+        order_code: reference,
+        customer_name: customer.name,
+        customer_phone: customer.phone,
+        item_summary: orderPayload.itemSummary,
+      }),
+    };
+
+    if (callbackUrl) {
+      initializePayload.callback_url = callbackUrl;
+    }
+
+    const initialized = await paystackRequest("/transaction/initialize", {
+      method: "POST",
+      body: initializePayload,
+    });
+    const data = initialized.data || {};
+    const paymentRecord = await paymentService.upsert(reference, {
+      provider: "paystack",
+      orderId: reference,
+      orderPayload: {
+        ...orderPayload,
+        payment: {
+          ...orderPayload.payment,
+          accessCode: data.access_code,
+          authorizationUrl: data.authorization_url,
+          channels,
+        },
+      },
+      expectedAmount: amount,
+      currency,
+      customer,
+      status: "initialized",
+      stockReserved: false,
+      accessCode: data.access_code,
+      authorizationUrl: data.authorization_url,
+      channels,
+      paystack: { initialized: data },
+    });
+
+    let order = await orderService.getOrder(reference);
+
+    if (!order) {
+      order = await orderService.createOrder(paymentRecord.orderPayload);
+    } else if (order.currentStatus === "Payment Pending") {
+      order = await orderService.updateOrder(reference, paymentRecord.orderPayload);
+    }
+
+    res.json({
+      reference,
+      authorizationUrl: data.authorization_url,
+      accessCode: data.access_code,
+      order,
+    });
+  } catch (e) {
+    res
+      .status(e.status || 500)
+      .json({ error: e.message || "Failed to initialize Paystack payment" });
+  }
+});
+
+app.get("/api/paystack/verify/:reference", async (req, res) => {
+  try {
+    const result = await completePaystackPayment(req.params.reference);
+
+    res.status(result.paid && result.status === "success" ? 200 : 202).json(result);
+  } catch (e) {
+    res
+      .status(e.status || 500)
+      .json({ error: e.message || "Failed to verify Paystack payment" });
+  }
+});
+
+app.post("/api/paystack/webhook", async (req, res) => {
+  if (!verifyPaystackSignature(req)) {
+    return res.status(401).json({ error: "Invalid Paystack signature" });
+  }
+
+  try {
+    const event = req.body || {};
+    const reference = event.data?.reference;
+
+    if (event.event === "charge.success" && reference) {
+      await completePaystackPayment(reference, { eventData: event.data });
+    }
+
+    res.sendStatus(200);
+  } catch (e) {
+    res.sendStatus(200);
+  }
 });
 
 app.get("/api/products", async (req, res) => {
@@ -401,23 +1144,22 @@ app.delete("/api/products/:id", writeLimiter, requireAuth, async (req, res) => {
   }
 });
 
-// Serve frontend in production if built
-if (process.env.NODE_ENV === "production") {
-  const staticPath = path.join(PROJECT_ROOT, "dist");
-  app.use(express.static(staticPath));
-  app.get("*", (req, res) => res.sendFile(path.join(staticPath, "index.html")));
-}
-
 // ===== Orders API =====
 app.post("/api/orders", async (req, res) => {
   try {
-    const order = await orderService.createOrder(req.body || {});
+    const payload = req.body || {};
+
+    await reserveOrderStock(payload.items || []);
+
+    const order = await orderService.createOrder(payload);
     // emit created
     if (global.io)
       global.io.emit("order:created", { orderId: order.id, order });
     res.json(order);
   } catch (e) {
-    res.status(500).json({ error: e.message || "Failed to create order" });
+    res
+      .status(e.status || 500)
+      .json({ error: e.message || "Failed to create order" });
   }
 });
 
@@ -480,6 +1222,13 @@ app.patch(
     }
   },
 );
+
+// Serve frontend in production after all API routes.
+if (process.env.NODE_ENV === "production") {
+  const staticPath = path.join(PROJECT_ROOT, "dist");
+  app.use(express.static(staticPath));
+  app.get("*", (req, res) => res.sendFile(path.join(staticPath, "index.html")));
+}
 
 // Create HTTP server and attach Socket.IO for realtime updates
 const server = http.createServer(app);

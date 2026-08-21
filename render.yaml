@@ -24,3 +24,13 @@ services:
         value: /var/data/products.json
       - key: UPLOAD_DIR
         value: /var/data/uploads
+      - key: PUBLIC_API_ORIGIN
+        value: https://api.lisatrendz.com
+      - key: PUBLIC_SITE_ORIGIN
+        value: https://lisatrendz.com
+      - key: PAYSTACK_SECRET_KEY
+        sync: false
+      - key: PAYSTACK_CURRENCY
+        value: GHS
+      - key: PAYSTACK_CHANNELS
+        value: card,mobile_money

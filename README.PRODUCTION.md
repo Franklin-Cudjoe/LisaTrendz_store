@@ -48,3 +48,7 @@ Environment variables
 - NODE_ENV=production to serve built frontend
 - VITE_API_BASE_URL - frontend build-time API origin when the frontend and API are on different domains
 - PUBLIC_API_ORIGIN - server public API origin used when returning uploaded image URLs
+- PUBLIC_SITE_ORIGIN - public storefront URL used as the Paystack callback URL
+- PAYSTACK_SECRET_KEY - Paystack secret key from the Paystack dashboard
+- PAYSTACK_CURRENCY - payment currency, usually GHS
+- PAYSTACK_CHANNELS - comma-separated Paystack channels, default card,mobile_money

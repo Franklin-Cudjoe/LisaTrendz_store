@@ -1,7 +1,9 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import "../styles/tracker.css";
+import { formatMoney } from "../utils/promotions.js";
 
 const ALL_STATUSES = [
+  "Payment Pending",
   "Placed",
   "Confirmed",
   "Packed",
@@ -11,6 +13,63 @@ const ALL_STATUSES = [
 ];
 
 const CANCELLED_STATUSES = ["Cancelled", "Returned", "Delivery Failed"];
+const ATTENTION_STATUSES = ["Payment Review"];
+
+function readLocalOrder(id) {
+  try {
+    const raw = localStorage.getItem("orders");
+    const orders = raw ? JSON.parse(raw) : {};
+
+    return orders?.[id] || null;
+  } catch (e) {
+    return null;
+  }
+}
+
+function getQuantity(item = {}) {
+  const quantity = Number(item.quantity ?? item.qty ?? 1);
+
+  return Number.isFinite(quantity) && quantity > 0 ? quantity : 1;
+}
+
+function getLineTotal(item = {}) {
+  const lineTotal = Number(item.lineTotal);
+
+  if (Number.isFinite(lineTotal)) return lineTotal;
+
+  return Number(item.price || item.unitPrice || 0) * getQuantity(item);
+}
+
+function getOrderTotals(order = {}) {
+  const subtotal = Number.isFinite(Number(order.subtotal))
+    ? Number(order.subtotal)
+    : (order.items || []).reduce((total, item) => total + getLineTotal(item), 0);
+  const shipping = Number(order.shipping ?? order.delivery?.cost ?? 0) || 0;
+  const discount = Number(order.discount?.totalDiscount || 0);
+  const total = Number.isFinite(Number(order.total))
+    ? Number(order.total)
+    : Math.max(0, subtotal + shipping - discount);
+
+  return { subtotal, shipping, discount, total };
+}
+
+function deliveryLabel(delivery) {
+  if (!delivery) return "Delivery not selected";
+  if (delivery.type === "pickup") return "Pick-up";
+  if (delivery.method === "within") return "Delivery within Accra";
+  if (delivery.method === "outside") return "Delivery outside Accra";
+
+  return "Delivery";
+}
+
+function statusClass(status) {
+  if (ATTENTION_STATUSES.includes(status)) return "issue";
+  if (status === "Payment Pending") return "pending";
+  if (CANCELLED_STATUSES.includes(status)) return "issue";
+  if (status === "Delivered") return "complete";
+
+  return "active";
+}
 
 export default function OrderTracker({ orderId: initialOrderId, onBack }) {
   const [orderId, setOrderId] = useState(initialOrderId || "");
@@ -40,8 +99,13 @@ export default function OrderTracker({ orderId: initialOrderId, onBack }) {
   }, [orderId]);
 
   async function loadOrder(id) {
-    if (!id) return;
+    const code = String(id || "").trim();
+
+    if (!code) return;
+
     setLoading(true);
+    setOrderId(code);
+
     try {
       const tryFetch = async (p) => {
         try {
@@ -58,19 +122,33 @@ export default function OrderTracker({ orderId: initialOrderId, onBack }) {
           return r2;
         }
       };
-      const res = await tryFetch(`/api/orders/${id}`);
+      const res = await tryFetch(`/api/orders/${encodeURIComponent(code)}`);
       const data = await res.json();
       setOrder(data);
+
       try {
-        const h = await tryFetch(`/api/orders/${id}/history`);
+        const h = await tryFetch(
+          `/api/orders/${encodeURIComponent(code)}/history`,
+        );
         const hist = await h.json();
         setHistory(hist || []);
       } catch (e) {
         setHistory([]);
       }
     } catch (e) {
-      setOrder(null);
-      setHistory([]);
+      const localOrder = readLocalOrder(code);
+
+      setOrder(localOrder);
+      setHistory(
+        localOrder
+          ? [
+              {
+                status: localOrder.currentStatus || "Placed",
+                timestamp: localOrder.createdAt || Date.now(),
+              },
+            ]
+          : [],
+      );
     } finally {
       setLoading(false);
     }
@@ -78,16 +156,18 @@ export default function OrderTracker({ orderId: initialOrderId, onBack }) {
 
   function onSubmit(e) {
     e.preventDefault();
-    if (!orderId) return;
     loadOrder(orderId);
   }
 
   const currentStatus = order?.currentStatus || "Placed";
   const isCancelled = CANCELLED_STATUSES.includes(currentStatus);
+  const needsAttention = ATTENTION_STATUSES.includes(currentStatus);
   const currentIdx = ALL_STATUSES.indexOf(currentStatus);
+  const showPipeline = !isCancelled && !needsAttention && currentIdx >= 0;
+  const totals = getOrderTotals(order || {});
 
   return (
-    <div className="tracker" style={{ maxWidth: 640, margin: "0 auto" }}>
+    <div className="tracker">
       {onBack && (
         <button className="back tracker-back" type="button" onClick={onBack}>
           Back
@@ -95,11 +175,7 @@ export default function OrderTracker({ orderId: initialOrderId, onBack }) {
       )}
 
       {!initialOrderId && (
-        <form
-          onSubmit={onSubmit}
-          className="tracker-form"
-          style={{ marginBottom: 20 }}
-        >
+        <form onSubmit={onSubmit} className="tracker-form">
           <input
             value={orderId}
             onChange={(e) => setOrderId(e.target.value.trim())}
@@ -111,120 +187,220 @@ export default function OrderTracker({ orderId: initialOrderId, onBack }) {
         </form>
       )}
 
-      {loading && <div style={{ padding: 16 }}>Loading…</div>}
+      {loading && <div className="tracker-muted">Loading...</div>}
 
       {!loading && !order && orderId && (
-        <div style={{ color: "var(--muted)", padding: 16 }}>
-          No order found. Check your code.
-        </div>
+        <div className="tracker-muted">No order found. Check your code.</div>
       )}
 
       {order && (
-        <div>
-          {/* Header */}
-          <div style={{ marginBottom: 20 }}>
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "flex-start",
-              }}
-            >
-              <div>
-                <h3 style={{ margin: "0 0 2px" }}>Order {order.id}</h3>
-                <div style={{ color: "var(--muted)", fontSize: ".85rem" }}>
-                  {new Date(
-                    order.createdAt || order.created || Date.now(),
-                  ).toLocaleString()}
-                </div>
-              </div>
-              <div style={{ textAlign: "right" }}>
-                <div style={{ fontWeight: 700, fontSize: "1.1rem" }}>
-                  ₵{(order.total || 0).toFixed(2)}
-                </div>
-              </div>
+        <div className="tracker-detail">
+          <section className="tracker-overview">
+            <div>
+              <span className="tracker-kicker">Order Code</span>
+              <h2>{order.orderCode || order.id}</h2>
+              <p>
+                {new Date(
+                  order.createdAt || order.created || Date.now(),
+                ).toLocaleString()}
+              </p>
+            </div>
+            <div className="tracker-overview-side">
+              <span className={`tracker-status ${statusClass(currentStatus)}`}>
+                {currentStatus}
+              </span>
+              <strong>{formatMoney(totals.total)}</strong>
+            </div>
+          </section>
+
+          <section className="tracker-section">
+            <div className="tracker-section-heading">
+              <h3>Ordered items</h3>
+              <span>
+                {(order.items || []).reduce(
+                  (total, item) => total + getQuantity(item),
+                  0,
+                )}{" "}
+                item(s)
+              </span>
             </div>
 
-            {/* Items */}
-            <div
-              style={{
-                marginTop: 12,
-                display: "flex",
-                gap: 6,
-                flexWrap: "wrap",
-              }}
-            >
-              {(order.items || []).map((it, idx) => (
-                <span
-                  key={idx}
-                  style={{
-                    background: "rgba(32,35,42,.08)",
-                    padding: "4px 10px",
-                    borderRadius: 20,
-                    fontSize: ".82rem",
-                  }}
+            <div className="tracker-items">
+              {(order.items || []).map((item, index) => (
+                <article
+                  className="tracker-item"
+                  key={`${item.id || item.productId || "item"}-${index}`}
                 >
-                  {it.name || it.id} × {it.quantity || it.qty || 1}
-                </span>
-              ))}
-            </div>
-          </div>
-
-          {/* Status pipeline */}
-          {isCancelled ? (
-            <div
-              style={{
-                padding: "18px 20px",
-                borderRadius: 10,
-                background: "#fff2f2",
-                border: "1.5px solid #f5c0c0",
-                fontWeight: 700,
-                color: "#b94f59",
-                fontSize: "1rem",
-              }}
-            >
-              {currentStatus}
-            </div>
-          ) : (
-            <div className="status-pipeline">
-              {ALL_STATUSES.map((status, idx) => {
-                const isDone = idx < currentIdx;
-                const isCurrent = idx === currentIdx;
-                const isFuture = idx > currentIdx;
-                return (
-                  <div
-                    key={status}
-                    className={
-                      "pipeline-step" +
-                      (isDone ? " done" : isCurrent ? " current" : " future")
-                    }
-                  >
-                    <div className="pipeline-left">
-                      <div className="pipeline-dot" />
-                      {idx < ALL_STATUSES.length - 1 && (
-                        <div className="pipeline-line" />
+                  <div className="tracker-item-image">
+                    {item.image ? (
+                      <img src={item.image} alt={item.name || "Ordered item"} />
+                    ) : (
+                      <span>{(item.name || "IT").slice(0, 2).toUpperCase()}</span>
+                    )}
+                  </div>
+                  <div className="tracker-item-main">
+                    <h4>{item.name || item.id || "Item"}</h4>
+                    <p>{item.category || "Collection"}</p>
+                    <div className="tracker-item-tags">
+                      {item.selectedSize && <span>Size {item.selectedSize}</span>}
+                      {item.selectedColor?.name && (
+                        <span>
+                          Colour {item.selectedColor.name}
+                          {item.selectedColor.value && (
+                            <i
+                              style={{
+                                backgroundColor: item.selectedColor.value,
+                              }}
+                              aria-hidden="true"
+                            />
+                          )}
+                        </span>
                       )}
-                    </div>
-                    <div className="pipeline-label">
-                      <span className="pipeline-status">{status}</span>
-                      {isCurrent &&
-                        history.length > 0 &&
-                        (() => {
-                          const entry = [...history]
-                            .reverse()
-                            .find((h) => h.status === status);
-                          return entry ? (
-                            <span className="pipeline-time">
-                              {new Date(entry.timestamp).toLocaleString()}
-                            </span>
-                          ) : null;
-                        })()}
+                      <span>Qty {getQuantity(item)}</span>
                     </div>
                   </div>
-                );
-              })}
+                  <div className="tracker-item-price">
+                    <span>{formatMoney(item.unitPrice || item.price || 0)}</span>
+                    <strong>{formatMoney(getLineTotal(item))}</strong>
+                  </div>
+                </article>
+              ))}
             </div>
-          )}
+          </section>
+
+          <section className="tracker-section tracker-order-info">
+            <div className="tracker-summary-panel">
+              <h3>Amount</h3>
+              <div>
+                <span>Subtotal</span>
+                <strong>{formatMoney(totals.subtotal)}</strong>
+              </div>
+              <div>
+                <span>Delivery</span>
+                <strong>{formatMoney(totals.shipping)}</strong>
+              </div>
+              {(order.promotion || totals.discount > 0) && (
+                <div className="tracker-discount-line">
+                  <span>
+                    Promo
+                    {order.promotion?.code ? ` (${order.promotion.code})` : ""}
+                  </span>
+                  <strong>
+                    {totals.discount > 0
+                      ? `-${formatMoney(totals.discount)}`
+                      : "Applied"}
+                  </strong>
+                </div>
+              )}
+              <div className="tracker-total-line">
+                <span>
+                  {currentStatus === "Payment Pending" ? "Total to pay" : "Total paid"}
+                </span>
+                <strong>{formatMoney(totals.total)}</strong>
+              </div>
+            </div>
+
+            <div className="tracker-summary-panel">
+              <h3>Delivery</h3>
+              <div>
+                <span>Method</span>
+                <strong>{deliveryLabel(order.delivery)}</strong>
+              </div>
+              <div>
+                <span>Status</span>
+                <strong>{currentStatus}</strong>
+              </div>
+              {order.trackingNumber && (
+                <div>
+                  <span>Tracking number</span>
+                  <strong>{order.trackingNumber}</strong>
+                </div>
+              )}
+              {order.carrier && (
+                <div>
+                  <span>Carrier</span>
+                  <strong>{order.carrier}</strong>
+                </div>
+              )}
+            </div>
+
+            <div className="tracker-summary-panel">
+              <h3>Payment</h3>
+              <div>
+                <span>Provider</span>
+                <strong>{order.payment?.provider || "Paystack"}</strong>
+              </div>
+              <div>
+                <span>Status</span>
+                <strong>{order.payment?.status || currentStatus}</strong>
+              </div>
+              {order.payment?.reference && (
+                <div>
+                  <span>Reference</span>
+                  <strong>{order.payment.reference}</strong>
+                </div>
+              )}
+              {order.payment?.method && (
+                <div>
+                  <span>Method</span>
+                  <strong>{order.payment.method}</strong>
+                </div>
+              )}
+            </div>
+          </section>
+
+          {isCancelled ? (
+            <div className="tracker-cancelled">{currentStatus}</div>
+          ) : needsAttention ? (
+            <div className="tracker-cancelled">{currentStatus}</div>
+          ) : showPipeline ? (
+            <section className="tracker-section">
+              <div className="tracker-section-heading">
+                <h3>Status timeline</h3>
+              </div>
+              <div className="status-pipeline">
+                {ALL_STATUSES.map((status, idx) => {
+                  const isDone = idx < currentIdx;
+                  const isCurrent = idx === currentIdx;
+                  return (
+                    <div
+                      key={status}
+                      className={
+                        "pipeline-step" +
+                        (isDone
+                          ? " done"
+                          : isCurrent
+                            ? " current"
+                            : " future")
+                      }
+                    >
+                      <div className="pipeline-left">
+                        <div className="pipeline-dot" />
+                        {idx < ALL_STATUSES.length - 1 && (
+                          <div className="pipeline-line" />
+                        )}
+                      </div>
+                      <div className="pipeline-label">
+                        <span className="pipeline-status">{status}</span>
+                        {isCurrent &&
+                          history.length > 0 &&
+                          (() => {
+                            const entry = [...history]
+                              .reverse()
+                              .find((h) => h.status === status);
+                            return entry ? (
+                              <span className="pipeline-time">
+                                {new Date(entry.timestamp).toLocaleString()}
+                              </span>
+                            ) : null;
+                          })()}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </section>
+          ) : null}
         </div>
       )}
     </div>

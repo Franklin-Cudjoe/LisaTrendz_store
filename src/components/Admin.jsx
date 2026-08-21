@@ -21,10 +21,16 @@ import {
   normalizeColorOption,
   normalizeProductColors,
 } from "../utils/productColors.js";
+import {
+  getProductStock,
+  getProductStockStatus,
+  normalizeProductStock,
+} from "../utils/productStock.js";
 
 const EMPTY_PRODUCT_FORM = {
   name: "",
   price: "",
+  stock: "10",
   category: "Dresses",
   image: "",
   imageFront: "",
@@ -36,6 +42,8 @@ const EMPTY_PRODUCT_FORM = {
 };
 
 const STATUS_OPTIONS = [
+  "Payment Pending",
+  "Payment Review",
   "Placed",
   "Confirmed",
   "Packed",
@@ -60,7 +68,9 @@ function cleanText(value) {
 }
 
 function normalizeProduct(product) {
-  return normalizeProductColors(normalizeProductImages(product));
+  return normalizeProductStock(
+    normalizeProductColors(normalizeProductImages(product)),
+  );
 }
 
 function photoCountLabel(count) {
@@ -120,6 +130,7 @@ function productFromForm(form, id) {
       id,
       name: cleanText(form.name),
       price: Number(form.price),
+      stock: getProductStock(form),
       category: cleanText(form.category) || "Dresses",
       image: imageFront,
       imageFront,
@@ -139,6 +150,7 @@ function formFromProduct(product) {
   return {
     name: product.name || "",
     price: product.price ?? "",
+    stock: product.stock ?? "",
     category: product.category || "Dresses",
     image: images.front,
     imageFront: images.front,
@@ -569,6 +581,11 @@ export default function Admin({ onChange, onLogout }) {
       return;
     }
 
+    if (product.stock == null) {
+      setNotice("Stock quantity is required.");
+      return;
+    }
+
     setSaving(true);
     setNotice("");
 
@@ -698,6 +715,7 @@ export default function Admin({ onChange, onLogout }) {
           {filteredItems.map((item) => {
             const images = getProductImages(item);
             const colors = getProductColors(item);
+            const stockStatus = getProductStockStatus(item);
             const isBusy = busyProductId === item.id;
 
             return (
@@ -723,6 +741,13 @@ export default function Admin({ onChange, onLogout }) {
                   </div>
                   <p>
                     {item.category || "Dresses"} / {formatMoney(item.price)}
+                  </p>
+                  <p>
+                    <span className={`owner-stock-pill ${stockStatus.key}`}>
+                      {stockStatus.stock == null
+                        ? stockStatus.label
+                        : `${stockStatus.label} (${stockStatus.stock})`}
+                    </span>
                   </p>
                   <p>
                     {photoCountLabel(images.count)} in gallery
@@ -822,19 +847,30 @@ export default function Admin({ onChange, onLogout }) {
                 />
               </label>
               <label>
-                Category
-                <select
-                  value={form.category}
-                  onChange={(event) => updateForm("category", event.target.value)}
-                >
-                  {categoryOptions.map((category) => (
-                    <option key={category} value={category}>
-                      {category}
-                    </option>
-                  ))}
-                </select>
+                Stock
+                <input
+                  type="number"
+                  min="0"
+                  step="1"
+                  value={form.stock}
+                  onChange={(event) => updateForm("stock", event.target.value)}
+                  placeholder="10"
+                />
               </label>
             </div>
+            <label>
+              Category
+              <select
+                value={form.category}
+                onChange={(event) => updateForm("category", event.target.value)}
+              >
+                {categoryOptions.map((category) => (
+                  <option key={category} value={category}>
+                    {category}
+                  </option>
+                ))}
+              </select>
+            </label>
             <ColorManager
               colors={getProductColors(form)}
               onAdd={addProductColor}
@@ -971,7 +1007,7 @@ export default function Admin({ onChange, onLogout }) {
       <header className="owner-header">
         <div>
           <span className="owner-kicker">Owner Studio</span>
-          <h2>Lizzy shop manager</h2>
+          <h2>LisaTrendz shop manager</h2>
           <p>
             {storageState === "ready"
               ? "Catalog storage is connected."

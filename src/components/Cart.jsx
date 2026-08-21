@@ -1,5 +1,10 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "../styles/cart.css";
+import {
+  calculateOrderTotals,
+  formatMoney,
+  validatePromoCode,
+} from "../utils/promotions.js";
 
 export default function Cart({
   items,
@@ -8,11 +13,38 @@ export default function Cart({
   onCheckout,
   drawer,
   onClose,
+  promotion,
+  onPromotionChange,
 }) {
   const [showDelivery, setShowDelivery] = useState(false);
   const [delivery, setDelivery] = useState({ type: "pickup", cost: 0 });
+  const [promoInput, setPromoInput] = useState(promotion?.code || "");
+  const [promoMessage, setPromoMessage] = useState("");
 
-  const subtotal = items.reduce((s, i) => s + i.price * i.qty, 0);
+  const totals = calculateOrderTotals(items, delivery, promotion);
+  const subtotal = totals.subtotal;
+  const totalDiscount = totals.discount.totalDiscount;
+
+  useEffect(() => {
+    setPromoInput(promotion?.code || "");
+  }, [promotion?.code]);
+
+  function handleApplyPromo(event) {
+    event.preventDefault();
+
+    const result = validatePromoCode(promoInput, subtotal);
+    setPromoMessage(result.message);
+
+    if (result.ok && onPromotionChange) {
+      onPromotionChange(result.promo);
+    }
+  }
+
+  function clearPromo() {
+    if (onPromotionChange) onPromotionChange(null);
+    setPromoInput("");
+    setPromoMessage("");
+  }
 
   function handleProceed() {
     if (!showDelivery) {
@@ -47,6 +79,7 @@ export default function Cart({
                     Colour: {i.selectedColor.name}
                   </p>
                 )}
+                {i.selectedSize && <p>Size: {i.selectedSize}</p>}
                 <p>Qty: {i.qty}</p>
                 <p>₵{(i.price * i.qty).toFixed(2)}</p>
                 <button
@@ -60,8 +93,54 @@ export default function Cart({
           ))}
 
           <div className="cart-total">
-            Subtotal: <strong>₵{subtotal.toFixed(2)}</strong>
+            <div>
+              <span>Subtotal</span>
+              <strong>{formatMoney(subtotal)}</strong>
+            </div>
+            {promotion && (
+              <div>
+                <span>Promo ({promotion.code})</span>
+                <strong>
+                  {totalDiscount > 0 ? `-${formatMoney(totalDiscount)}` : "Applied"}
+                </strong>
+              </div>
+            )}
+            {showDelivery && (
+              <div>
+                <span>Delivery</span>
+                <strong>{formatMoney(totals.shipping)}</strong>
+              </div>
+            )}
+            <div className="cart-total-final">
+              <span>Total</span>
+              <strong>{formatMoney(totals.total)}</strong>
+            </div>
           </div>
+
+          <form className="promo-panel" onSubmit={handleApplyPromo}>
+            <label htmlFor="promo-code">Promo code</label>
+            <div className="promo-entry">
+              <input
+                id="promo-code"
+                value={promoInput}
+                onChange={(event) => setPromoInput(event.target.value)}
+                placeholder="LISA10"
+              />
+              <button className="btn secondary tiny" type="submit">
+                Apply
+              </button>
+            </div>
+            <div className="promo-foot">
+              <span>
+                {promoMessage || "Available: LISA10, TREND20, FREESHIP"}
+              </span>
+              {promotion && (
+                <button type="button" onClick={clearPromo}>
+                  Remove
+                </button>
+              )}
+            </div>
+          </form>
 
           {showDelivery && (
             <div className="delivery-panel">
@@ -207,7 +286,7 @@ export default function Cart({
           <div style={{ marginTop: 12 }}>
             <button className="btn" onClick={handleProceed}>
               {showDelivery
-                ? `Continue to payment (₵${(subtotal + (delivery.cost || 0)).toFixed(2)})`
+                ? `Continue to payment (${formatMoney(totals.total)})`
                 : "Proceed to checkout"}
             </button>
             {showDelivery && (

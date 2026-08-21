@@ -168,6 +168,13 @@
   background:rgba(15,118,110,.1);color:var(--accent-2);font-size:.72rem;font-weight:900;
 }
 .owner-status-pill.hidden{background:rgba(32,35,42,.08);color:var(--muted)}
+.owner-stock-pill{
+  display:inline-flex;align-items:center;width:max-content;min-height:28px;padding:5px 8px;border-radius:8px;
+  background:rgba(255,255,255,.54);border:1px solid var(--line-light);color:var(--accent-dark);font-size:.76rem;font-weight:900;
+}
+.owner-stock-pill.in-stock{color:var(--accent-2)}
+.owner-stock-pill.low-stock{color:#8a6a12;background:rgba(198,185,139,.2);border-color:rgba(198,185,139,.34)}
+.owner-stock-pill.sold-out{color:#8e1e1e;background:rgba(142,30,30,.08);border-color:rgba(142,30,30,.18)}
 .owner-row-actions{display:grid;grid-template-columns:1fr;gap:8px}
 .owner-danger-button{
   padding:9px 12px;border:1px solid rgba(142,30,30,.22);background:rgba(142,30,30,.08);color:#8e1e1e;
