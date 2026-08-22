@@ -206,7 +206,7 @@ export default function Home({
             />
           </label>
 
-          <label className="filter-field">
+          <label className="filter-field sort-field">
             <span>Sort</span>
             <select
               value={sortBy}
@@ -220,7 +220,7 @@ export default function Home({
             </select>
           </label>
 
-          <label className="filter-field">
+          <label className="filter-field color-filter">
             <span>Colour</span>
             <select
               value={selectedColor}
@@ -235,7 +235,7 @@ export default function Home({
             </select>
           </label>
 
-          <label className="filter-field">
+          <label className="filter-field availability-field">
             <span>Availability</span>
             <select
               value={availability}

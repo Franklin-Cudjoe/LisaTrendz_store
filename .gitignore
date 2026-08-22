@@ -5,3 +5,4 @@ dist/
 .startup-test-*.log
 *.bak
 server/server/
+server/orders.json

@@ -24,9 +24,9 @@
 .media{position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;width:100%;height:clamp(230px,31vw,340px);background:linear-gradient(135deg,rgba(251,248,251,.9),rgba(237,247,244,.72))}
 .media img{width:100%;height:100%;object-fit:cover;object-position:center;display:block;transition:transform .7s cubic-bezier(.2,.8,.2,1)}
 .save-product-button{
-  position:absolute;top:10px;right:10px;z-index:4;min-height:34px;padding:7px 10px;border-radius:8px;border:1px solid rgba(255,255,255,.72);
+  position:absolute;top:10px;right:10px;z-index:4;min-height:32px;padding:6px 9px;border-radius:8px;border:1px solid rgba(255,255,255,.72);
   background:rgba(255,255,255,.76);color:var(--ink);font-size:.76rem;font-weight:900;cursor:pointer;
-  box-shadow:0 10px 24px rgba(32,35,42,.12);backdrop-filter:blur(16px) saturate(150%);
+  box-shadow:none;backdrop-filter:blur(16px) saturate(150%);
 }
 .save-product-button.active{background:rgba(15,118,110,.92);color:#fff;border-color:rgba(255,255,255,.42)}
 .save-product-button:focus-visible{outline:3px solid rgba(15,118,110,.28);outline-offset:3px}
@@ -52,7 +52,7 @@
 .product-fit{color:var(--muted);font-size:.78rem;font-weight:750}
 .price{color:var(--ink);font-weight:950;font-size:1.14rem;margin:0}
 .card-actions{display:grid;grid-template-columns:1fr 1.2fr;gap:8px;margin-top:auto}
-.card-actions .btn{min-height:42px;padding:10px 12px}
+.card-actions .btn{min-height:38px;padding:8px 10px}
 
 .product-page{max-width:var(--max-width);margin:22px auto;padding:0 14px}
 .product-page .product-detail{display:grid;grid-template-columns:1fr;gap:16px;align-items:start;background:linear-gradient(145deg,rgba(255,255,255,.82),rgba(255,255,255,.54));border:1px solid var(--line-light);border-radius:8px;padding:12px;box-shadow:var(--shadow);backdrop-filter:blur(24px) saturate(155%)}
@@ -140,6 +140,7 @@
 .product-page-perks{display:grid;grid-template-columns:1fr;gap:8px;margin:22px 0}
 .product-page-perks span{background:rgba(255,255,255,.48);border:1px solid var(--line-light);border-radius:8px;padding:12px 10px;font-size:.84rem;font-weight:850;color:var(--accent-dark);backdrop-filter:blur(18px)}
 .actions{display:grid;grid-template-columns:1fr;gap:9px}
+.actions .btn{min-height:38px;padding:9px 12px}
 
 .wishlist-page{max-width:var(--max-width);margin:24px auto 52px;padding:0 14px}
 .wishlist-hero{
@@ -211,7 +212,7 @@
 .collection-toolbar{
   display:grid;grid-template-columns:1fr;gap:10px;margin:0 0 18px;padding:12px;
   background:linear-gradient(145deg,rgba(255,255,255,.78),rgba(255,255,255,.48));
-  border:1px solid var(--line-light);border-radius:8px;box-shadow:var(--shadow-soft),inset 0 1px 0 rgba(255,255,255,.68);
+  border:1px solid var(--line-light);border-radius:8px;box-shadow:inset 0 1px 0 rgba(255,255,255,.68);
   backdrop-filter:blur(22px) saturate(150%);
 }
 .filter-field{display:grid;gap:6px;min-width:0}
@@ -273,6 +274,40 @@
 @media (max-width:639px){
   .product-grid{justify-items:center}
   .card{width:min(100%,360px)}
+  .collection-heading{padding:16px 0 10px;margin-bottom:6px}
+  .collection-heading h2{font-size:clamp(1.55rem,7vw,2.1rem)}
+  .collection-toolbar{
+    grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;padding:8px;margin:0 0 14px;
+    background:rgba(255,255,255,.58);box-shadow:none;
+  }
+  .search-field{
+    grid-column:1/-1;position:relative;padding:7px;border:1px solid rgba(32,35,42,.08);
+    border-radius:8px;background:rgba(255,255,255,.42);
+  }
+  .search-field::before{
+    content:"";position:absolute;left:19px;bottom:20px;width:10px;height:10px;
+    border:2px solid var(--accent-2);border-radius:50%;pointer-events:none;
+  }
+  .search-field::after{
+    content:"";position:absolute;left:29px;bottom:18px;width:7px;height:2px;
+    background:var(--accent-2);border-radius:999px;transform:rotate(45deg);pointer-events:none;
+  }
+  .filter-field{gap:4px}
+  .filter-field span,.filter-actions span{font-size:.62rem;letter-spacing:.08em}
+  .filter-field input,.filter-field select{
+    min-height:36px;padding:8px 8px;border-color:rgba(32,35,42,.1);font-size:.8rem;
+    background:rgba(255,255,255,.62);
+  }
+  .search-field input[type="search"]{
+    min-height:38px;padding-left:34px;font-size:.88rem;border-color:rgba(15,118,110,.16);background:rgba(255,255,255,.74);
+  }
+  .sort-field,.color-filter,.availability-field{grid-column:span 1}
+  .price-filter{grid-column:1/-1}
+  .filter-field input[type="range"]{min-height:32px}
+  .filter-actions{
+    grid-column:1/-1;align-items:center;justify-content:space-between;padding-top:1px;
+  }
+  .filter-actions .btn{width:auto;min-height:30px;padding:6px 10px}
   .product-page{padding:0 14px}
   .product-page .product-detail{justify-items:center}
   .product-detail-media.garment-gallery{width:100%;max-width:390px}
