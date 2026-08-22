@@ -44,6 +44,17 @@ class PaymentService {
     );
   }
 
+  async findByOrderSmsMessageId(messageId) {
+    await this._ensureLoaded();
+
+    return (
+      this._data.payments.find(
+        (payment) =>
+          payment.notifications?.orderCodeSms?.messageId === messageId,
+      ) || null
+    );
+  }
+
   async upsert(reference, data = {}) {
     await this._ensureLoaded();
 

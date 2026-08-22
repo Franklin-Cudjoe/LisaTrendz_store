@@ -11,7 +11,20 @@
     "description": "TEST",
     "active": true,
     "createdAt": 1787257540143,
-    "updatedAt": 1787275991420
+    "updatedAt": 1787358322504,
+    "images": [
+      "/uploads/1787257522955-d47e70c5-2b5c-401f-9a0d-e6eca66a59d0-img1.jpg"
+    ],
+    "colors": [
+      {
+        "name": "Red",
+        "value": "#f5192f"
+      },
+      {
+        "name": "Blue",
+        "value": "#1310e5"
+      }
+    ]
   },
   {
     "id": "P-THR1OJV",

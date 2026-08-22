@@ -79,6 +79,60 @@ body{
 .site-footer{background:linear-gradient(135deg,rgba(32,35,42,.96),rgba(15,118,110,.86));color:#fff;margin-top:0;backdrop-filter:blur(18px)}
 .site-footer .container-row{justify-content:center;padding:20px 0}
 
+.app-root-returning main{animation:homeReturnFocus .72s cubic-bezier(.2,.9,.18,1) both}
+.payment-return-overlay{
+  position:fixed;inset:0;z-index:260;display:flex;align-items:center;justify-content:center;padding:22px;
+  background:rgba(32,35,42,.2);backdrop-filter:blur(16px) saturate(150%);
+  pointer-events:none;animation:returnBackdropIn .42s ease both;
+}
+.payment-return-window{
+  width:min(340px,calc(100vw - 44px));display:grid;gap:8px;justify-items:start;
+  border:1px solid rgba(255,255,255,.76);border-radius:14px;padding:14px 16px 16px;
+  background:linear-gradient(145deg,rgba(255,255,255,.92),rgba(241,240,234,.82));
+  box-shadow:0 34px 90px rgba(32,35,42,.26),inset 0 1px 0 rgba(255,255,255,.82);
+  transform-origin:center bottom;animation:macWindowReturn .82s cubic-bezier(.18,.98,.25,1) both;
+}
+.payment-return-controls{display:flex;gap:6px;margin-bottom:3px}
+.payment-return-controls span{width:10px;height:10px;border-radius:50%;background:#d9534f}
+.payment-return-controls span:nth-child(2){background:#e6b84e}
+.payment-return-controls span:nth-child(3){background:#4caf69}
+.payment-return-window strong{font-family:"Playfair Display",Georgia,serif;font-size:1.25rem;line-height:1}
+.payment-return-window p{margin:0;color:var(--muted);font-weight:850}
+.payment-return-progress{width:100%;height:4px;border-radius:999px;overflow:hidden;background:rgba(32,35,42,.1)}
+.payment-return-progress::before{
+  content:"";display:block;width:42%;height:100%;border-radius:inherit;background:var(--accent-2);
+  animation:returnProgress .82s cubic-bezier(.2,.8,.2,1) both;
+}
+.payment-dialog-overlay{animation:dialogBackdropIn .28s ease both}
+.payment-dialog{animation:macDialogIn .48s cubic-bezier(.18,.98,.25,1) both;transform-origin:center bottom}
+
+@keyframes returnBackdropIn{
+  from{opacity:0}
+  to{opacity:1}
+}
+@keyframes homeReturnFocus{
+  0%{opacity:.82;transform:scale(.985) translateY(8px);filter:blur(3px)}
+  100%{opacity:1;transform:none;filter:none}
+}
+@keyframes macWindowReturn{
+  0%{opacity:0;transform:translate3d(0,58px,0) scale(.72);filter:blur(10px)}
+  56%{opacity:1;transform:translate3d(0,-4px,0) scale(1.025);filter:blur(0)}
+  100%{opacity:1;transform:none;filter:none}
+}
+@keyframes macDialogIn{
+  0%{opacity:0;transform:translate3d(0,42px,0) scale(.84);filter:blur(8px)}
+  60%{opacity:1;transform:translate3d(0,-3px,0) scale(1.018);filter:blur(0)}
+  100%{opacity:1;transform:none;filter:none}
+}
+@keyframes dialogBackdropIn{
+  from{opacity:0}
+  to{opacity:1}
+}
+@keyframes returnProgress{
+  from{transform:translateX(-100%)}
+  to{transform:translateX(240%)}
+}
+
 @media (max-width:639px){
   .container:not(.full-width){width:min(calc(100vw - 28px),362px);margin:22px 14px}
   .container-row{width:min(calc(100vw - 16px),374px);margin:0 8px}
@@ -104,5 +158,5 @@ body{
 }
 
 @media (prefers-reduced-motion:reduce){
-  .btn,.card,.media img,.cat-btn,.cart-drawer{transition:none;animation:none}
+  .btn,.card,.media img,.cat-btn,.cart-drawer,.app-root-returning main,.payment-return-overlay,.payment-return-window,.payment-return-progress::before,.payment-dialog-overlay,.payment-dialog{transition:none;animation:none}
 }

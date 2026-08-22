@@ -3,7 +3,7 @@
     "id": "P-93OOP9H",
     "name": "Nmae2",
     "price": 15,
-    "stock": 5,
+    "stock": 4,
     "category": "Dresses",
     "image": "/uploads/1787257522955-d47e70c5-2b5c-401f-9a0d-e6eca66a59d0-img1.jpg",
     "imageFront": "/uploads/1787257522955-d47e70c5-2b5c-401f-9a0d-e6eca66a59d0-img1.jpg",
@@ -11,7 +11,7 @@
     "description": "TEST",
     "active": true,
     "createdAt": 1787257540143,
-    "updatedAt": 1787257540143
+    "updatedAt": 1787275991420
   },
   {
     "id": "P-THR1OJV",

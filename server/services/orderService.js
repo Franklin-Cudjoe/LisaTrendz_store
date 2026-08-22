@@ -23,11 +23,29 @@ class OrderService {
     this._loaded = false;
   }
 
+  _normalizeData(parsed) {
+    const sourceOrders = Array.isArray(parsed)
+      ? parsed
+      : Array.isArray(parsed?.orders)
+        ? parsed.orders
+        : [];
+    const orders = sourceOrders.filter(
+      (order) =>
+        order &&
+        typeof order === "object" &&
+        !Array.isArray(order) &&
+        (order.id || order.orderCode),
+    );
+    const history = Array.isArray(parsed?.history) ? parsed.history : [];
+
+    return { orders, history };
+  }
+
   async _ensureLoaded() {
     if (this._loaded) return;
     try {
       const raw = await fs.readFile(this.file, "utf8");
-      this._data = JSON.parse(raw);
+      this._data = this._normalizeData(JSON.parse(raw));
     } catch (e) {
       this._data = { orders: [], history: [] };
       await this._write();
@@ -96,8 +114,15 @@ class OrderService {
       eta: data.eta || null,
       trackingNumber: data.trackingNumber || null,
       carrier: data.carrier || null,
+      notifications: data.notifications || {},
       metadata: data.metadata || {},
     };
+    this._data.orders = Array.isArray(this._data.orders)
+      ? this._data.orders
+      : [];
+    this._data.history = Array.isArray(this._data.history)
+      ? this._data.history
+      : [];
     this._data.orders.unshift(order);
     this._data.history.push({
       orderId: id,
@@ -155,6 +180,9 @@ class OrderService {
     const ts = this._now();
     order.currentStatus = newStatus;
     order.updatedAt = ts;
+    this._data.history = Array.isArray(this._data.history)
+      ? this._data.history
+      : [];
     this._data.history.push({
       orderId,
       status: newStatus,

@@ -32,7 +32,28 @@ PAYSTACK_CURRENCY=GHS
 PAYSTACK_CHANNELS=card,mobile_money
 PUBLIC_SITE_ORIGIN=http://127.0.0.1:5173
 PUBLIC_API_ORIGIN=http://localhost:4000
+SMS_ENABLED=true
+SMS_PROVIDER=arkesel
+SMS_DEFAULT_COUNTRY_CODE=+233
+SMS_BRAND_NAME=LisaTrendz
+ARKESEL_API_KEY=your_arkesel_api_key
+ARKESEL_SENDER_ID=LisaTrendz
+ARKESEL_CALLBACK_URL=
+DEV_PAYMENT_BYPASS=false
 ```
+
+`.env.example` is only a template. The running server reads `.env` and
+`server/.env`.
+
+When Paystack verifies a successful payment, the backend sends the order code by
+SMS to the checkout mobile number through Arkesel. The SMS is skipped when
+`SMS_ENABLED=false`.
+`ARKESEL_CALLBACK_URL` is optional and should point to a public API URL if you
+want Arkesel delivery reports saved against orders.
+
+In the normal checkout flow, the SMS is sent only after Paystack payment is
+verified. For local SMS testing before Paystack is ready, use
+`npm run start:test-sms` to enable the temporary checkout bypass.
 
 Next steps
 

@@ -5,16 +5,21 @@ import {
   formatMoney,
   validatePromoCode,
 } from "../utils/promotions.js";
+import { colorOptionKey, getProductColors } from "../utils/productColors.js";
+import { getProductSizes } from "../utils/productSizing.js";
+import { getProductStock } from "../utils/productStock.js";
 
 export default function Cart({
   items,
   onRemove,
+  onQuantityChange,
   onBack,
   onCheckout,
   drawer,
   onClose,
   promotion,
   onPromotionChange,
+  onVariantChange,
 }) {
   const [showDelivery, setShowDelivery] = useState(false);
   const [delivery, setDelivery] = useState({ type: "pickup", cost: 0 });
@@ -65,32 +70,122 @@ export default function Cart({
         <p>Your cart is empty.</p>
       ) : (
         <div className="cart-list">
-          {items.map((i) => (
-            <div className="cart-item" key={i.cartKey || i.id}>
+          {items.map((i) => {
+            const cartKey = i.cartKey || i.id;
+            const qty = Math.max(1, Number(i.qty || 1));
+            const stock = getProductStock(i);
+            const maxQty = stock == null ? undefined : Math.max(1, stock);
+            const canIncrease = maxQty == null || qty < maxQty;
+            const colors = getProductColors(i);
+            const sizes = getProductSizes(i);
+
+            return (
+              <div className="cart-item" key={cartKey}>
               <img src={i.image} alt={i.name} />
               <div className="meta">
                 <h3>{i.name}</h3>
-                {i.selectedColor && (
-                  <p className="cart-color">
-                    <span
-                      style={{ backgroundColor: i.selectedColor.value }}
-                      aria-hidden="true"
-                    />
-                    Colour: {i.selectedColor.name}
-                  </p>
+                {colors.length > 0 && (
+                  <div className="cart-option-row">
+                    <span>Colour</span>
+                    <div className="cart-color-options">
+                      {colors.map((color, index) => {
+                        const active =
+                          i.selectedColor &&
+                          i.selectedColor.name === color.name &&
+                          i.selectedColor.value === color.value;
+
+                        return (
+                          <button
+                            key={colorOptionKey(color, index)}
+                            className={active ? "active" : ""}
+                            type="button"
+                            onClick={() =>
+                              onVariantChange?.(cartKey, {
+                                selectedColor: color,
+                              })
+                            }
+                            aria-pressed={active}
+                            aria-label={`Choose ${color.name} for ${i.name}`}
+                            title={color.name}
+                          >
+                            <i
+                              style={{ backgroundColor: color.value }}
+                              aria-hidden="true"
+                            />
+                            {color.name}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
                 )}
-                {i.selectedSize && <p>Size: {i.selectedSize}</p>}
-                <p>Qty: {i.qty}</p>
-                <p>₵{(i.price * i.qty).toFixed(2)}</p>
+                {sizes.length > 0 && (
+                  <div className="cart-option-row">
+                    <span>Size</span>
+                    <div className="cart-size-options">
+                      {sizes.map((size) => (
+                        <button
+                          key={size}
+                          className={i.selectedSize === size ? "active" : ""}
+                          type="button"
+                          onClick={() =>
+                            onVariantChange?.(cartKey, {
+                              selectedSize: size,
+                            })
+                          }
+                          aria-pressed={i.selectedSize === size}
+                        >
+                          {size}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                <div className="cart-quantity-row">
+                  <span>Qty</span>
+                  <div className="cart-quantity-control">
+                    <button
+                      type="button"
+                      onClick={() => onQuantityChange?.(cartKey, qty - 1)}
+                      disabled={qty <= 1}
+                      aria-label={`Decrease ${i.name} quantity`}
+                    >
+                      -
+                    </button>
+                    <input
+                      type="number"
+                      min="1"
+                      max={maxQty}
+                      value={qty}
+                      onChange={(event) =>
+                        onQuantityChange?.(cartKey, event.target.value)
+                      }
+                      aria-label={`${i.name} quantity`}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => onQuantityChange?.(cartKey, qty + 1)}
+                      disabled={!canIncrease}
+                      aria-label={`Increase ${i.name} quantity`}
+                    >
+                      +
+                    </button>
+                  </div>
+                </div>
+                {maxQty != null && (
+                  <p className="cart-stock-note">Available: {maxQty}</p>
+                )}
+                <p className="cart-line-price">{formatMoney(i.price * qty)}</p>
                 <button
                   className="btn tiny"
-                  onClick={() => onRemove(i.cartKey || i.id)}
+                  onClick={() => onRemove(cartKey)}
                 >
                   Remove
                 </button>
               </div>
             </div>
-          ))}
+            );
+          })}
 
           <div className="cart-total">
             <div>
@@ -131,9 +226,7 @@ export default function Cart({
               </button>
             </div>
             <div className="promo-foot">
-              <span>
-                {promoMessage || "Available: LISA10, TREND20, FREESHIP"}
-              </span>
+              <span>{promoMessage}</span>
               {promotion && (
                 <button type="button" onClick={clearPromo}>
                   Remove

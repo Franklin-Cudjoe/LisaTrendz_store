@@ -1,29 +1,29 @@
-export const PROMO_CODES = [
-  {
-    code: "LISA10",
-    label: "10% off",
-    description: "10% off your product subtotal.",
-    type: "percent",
-    value: 10,
-    minSubtotal: 0,
-  },
-  {
-    code: "TREND20",
-    label: "GHS 20 off",
-    description: "GHS 20 off orders from GHS 150.",
-    type: "amount",
-    value: 20,
-    minSubtotal: 150,
-  },
-  {
-    code: "FREESHIP",
-    label: "Free delivery",
-    description: "Delivery fee removed at checkout.",
-    type: "shipping",
-    value: 0,
-    minSubtotal: 0,
-  },
-];
+// export const PROMO_CODES = [
+//   {
+//     code: "LISA10",
+//     label: "10% off",
+//     description: "10% off your product subtotal.",
+//     type: "percent",
+//     value: 10,
+//     minSubtotal: 0,
+//   },
+//   {
+//     code: "TREND20",
+//     label: "GHS 20 off",
+//     description: "GHS 20 off orders from GHS 150.",
+//     type: "amount",
+//     value: 20,
+//     minSubtotal: 150,
+//   },
+//   {
+//     code: "FREESHIP",
+//     label: "Free delivery",
+//     description: "Delivery fee removed at checkout.",
+//     type: "shipping",
+//     value: 0,
+//     minSubtotal: 0,
+//   },
+// ];
 
 export function formatMoney(value) {
   return `GHS ${Number(value || 0).toFixed(2)}`;

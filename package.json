@@ -4,7 +4,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "start": "node scripts/start.mjs"
+    "start": "node scripts/start.mjs",
+    "start:test-sms": "node scripts/start.mjs --dev-payment-bypass"
   },
   "dependencies": {
     "react": "^18.2.0",

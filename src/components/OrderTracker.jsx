@@ -62,6 +62,31 @@ function deliveryLabel(delivery) {
   return "Delivery";
 }
 
+function customerName(order = {}) {
+  return (
+    order.customer?.name ||
+    order.customerName ||
+    order.name ||
+    "Customer"
+  );
+}
+
+function maskPhone(value) {
+  const digits = String(value || "").replace(/\D/g, "");
+
+  if (digits.length < 7) return "";
+
+  return `${digits.slice(0, 3)}***${digits.slice(-4)}`;
+}
+
+function smsStatusLabel(notification = {}) {
+  if (notification.sentAt) return "Sent";
+  if (notification.status === "failed") return "Failed";
+  if (notification.status === "skipped") return "Not enabled";
+
+  return "Pending";
+}
+
 function statusClass(status) {
   if (ATTENTION_STATUSES.includes(status)) return "issue";
   if (status === "Payment Pending") return "pending";
@@ -165,6 +190,8 @@ export default function OrderTracker({ orderId: initialOrderId, onBack }) {
   const currentIdx = ALL_STATUSES.indexOf(currentStatus);
   const showPipeline = !isCancelled && !needsAttention && currentIdx >= 0;
   const totals = getOrderTotals(order || {});
+  const orderSms = order?.notifications?.orderCodeSms || {};
+  const customerPhone = order?.customer?.phone || order?.phone || "";
 
   return (
     <div className="tracker">
@@ -322,6 +349,24 @@ export default function OrderTracker({ orderId: initialOrderId, onBack }) {
                   <strong>{order.carrier}</strong>
                 </div>
               )}
+            </div>
+
+            <div className="tracker-summary-panel">
+              <h3>Customer</h3>
+              <div>
+                <span>Name</span>
+                <strong>{customerName(order)}</strong>
+              </div>
+              {maskPhone(customerPhone) && (
+                <div>
+                  <span>Mobile</span>
+                  <strong>{maskPhone(customerPhone)}</strong>
+                </div>
+              )}
+              <div>
+                <span>Order code SMS</span>
+                <strong>{smsStatusLabel(orderSms)}</strong>
+              </div>
             </div>
 
             <div className="tracker-summary-panel">

@@ -1,10 +1,23 @@
-import { spawn } from "node:child_process";
+import { existsSync } from "node:fs";
+import { spawn, spawnSync } from "node:child_process";
 import { createServer } from "node:net";
+import { join } from "node:path";
 
 const DEFAULT_API_PORT = 4000;
 const DEFAULT_WEB_PORT = 5173;
 const HOST = "127.0.0.1";
 const PORT_SEARCH_LIMIT = 50;
+const SERVER_DEPENDENCY_CHECK = join(
+  process.cwd(),
+  "server",
+  "node_modules",
+  "express",
+  "package.json",
+);
+const enableDevPaymentBypass =
+  process.argv.includes("--dev-payment-bypass") ||
+  process.env.DEV_PAYMENT_BYPASS === "true" ||
+  process.env.VITE_DEV_PAYMENT_BYPASS === "true";
 
 function readPort(name, fallback) {
   const value = Number.parseInt(process.env[name] || "", 10);
@@ -70,6 +83,34 @@ function startCommand(label, args, env = {}) {
   return child;
 }
 
+function runNpm(args) {
+  const command = process.platform === "win32" ? "cmd.exe" : "npm";
+  const commandArgs =
+    process.platform === "win32"
+      ? ["/d", "/s", "/c", ["npm", ...args].map(quoteCommandPart).join(" ")]
+      : args;
+
+  return spawnSync(command, commandArgs, {
+    stdio: "inherit",
+    env: process.env,
+  });
+}
+
+function ensureServerDependencies() {
+  if (existsSync(SERVER_DEPENDENCY_CHECK)) {
+    return;
+  }
+
+  console.log("Installing server dependencies...");
+  const result = runNpm(["--prefix", "server", "install"]);
+
+  if (result.status !== 0) {
+    throw new Error("Could not install server dependencies.");
+  }
+}
+
+ensureServerDependencies();
+
 const apiPort = await findOpenPort(readPort("PORT", DEFAULT_API_PORT));
 const webPort = await findOpenPort(readPort("VITE_PORT", DEFAULT_WEB_PORT));
 const apiOrigin = `http://localhost:${apiPort}`;
@@ -77,10 +118,14 @@ const webOrigin = `http://${HOST}:${webPort}`;
 
 console.log(`Starting API on ${apiOrigin}`);
 console.log(`Starting storefront on ${webOrigin}`);
+if (enableDevPaymentBypass) {
+  console.log("Development payment bypass is enabled for this run.");
+}
 
 const children = [
   startCommand("api", ["--prefix", "server", "run", "start"], {
     PORT: String(apiPort),
+    DEV_PAYMENT_BYPASS: enableDevPaymentBypass ? "true" : "false",
   }),
   startCommand(
     "storefront",
@@ -98,6 +143,7 @@ const children = [
     {
       VITE_API_TARGET: apiOrigin,
       VITE_API_BASE_URL: "",
+      VITE_DEV_PAYMENT_BYPASS: enableDevPaymentBypass ? "true" : "false",
     },
   ),
 ];

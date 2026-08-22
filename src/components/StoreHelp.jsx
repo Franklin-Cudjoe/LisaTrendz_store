@@ -16,7 +16,7 @@ const HELP_ITEMS = [
   },
   {
     title: "Payments",
-    text: "Secure card and mobile money payments are handled through Paystack. Your order code is created before payment and confirmed after Paystack verifies it.",
+    text: "Secure card and mobile money payments are handled through Paystack. Your order code is sent by SMS after Paystack verifies payment.",
   },
 ];
 

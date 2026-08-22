@@ -1,3 +1,2509 @@
 {
-  "payments": []
+  "payments": [
+    {
+      "provider": "paystack",
+      "orderId": "ORD-0YVHZZU",
+      "orderPayload": {
+        "id": "ORD-0YVHZZU",
+        "orderCode": "ORD-0YVHZZU",
+        "userId": null,
+        "customer": {
+          "name": "Franklin Cudjoe",
+          "email": "lcudjoe73@gmail.com",
+          "phone": "+233551704776"
+        },
+        "email": "lcudjoe73@gmail.com",
+        "phone": "+233551704776",
+        "items": [
+          {
+            "id": "P-THR1OJV",
+            "productId": "P-THR1OJV",
+            "name": "name",
+            "category": "Dresses",
+            "description": "fabric",
+            "image": "/uploads/1787257490819-0f6e39f1-2ccb-4a82-93bd-f0163f4e08dc-img1.jpg",
+            "selectedColor": null,
+            "selectedSize": "XS",
+            "quantity": 1,
+            "qty": 1,
+            "unitPrice": 14,
+            "price": 14,
+            "lineTotal": 14
+          }
+        ],
+        "itemCount": 1,
+        "itemSummary": "name (XS) x 1",
+        "subtotal": 14,
+        "shipping": 0,
+        "discount": {
+          "subtotalDiscount": 0,
+          "shippingDiscount": 0,
+          "totalDiscount": 0
+        },
+        "promotion": null,
+        "delivery": {
+          "type": "pickup",
+          "cost": 0
+        },
+        "total": 14,
+        "amountPaid": 0,
+        "currency": "GHS",
+        "currentStatus": "Payment Pending",
+        "payment": {
+          "provider": "paystack",
+          "reference": "ORD-0YVHZZU",
+          "status": "initialized",
+          "channels": [
+            "card",
+            "mobile_money"
+          ],
+          "accessCode": "s9mnbk6jzoy0cm2",
+          "authorizationUrl": "https://checkout.paystack.com/s9mnbk6jzoy0cm2"
+        },
+        "metadata": {
+          "paystackReference": "ORD-0YVHZZU",
+          "paymentProvider": "paystack"
+        },
+        "createdAt": 1787383600329
+      },
+      "expectedAmount": 1400,
+      "currency": "GHS",
+      "customer": {
+        "name": "Franklin Cudjoe",
+        "email": "lcudjoe73@gmail.com",
+        "phone": "+233551704776"
+      },
+      "receiptInfo": {
+        "name": "Franklin Cudjoe",
+        "email": "lcudjoe73@gmail.com",
+        "phone": "+233551704776"
+      },
+      "smsRecipient": "+233551704776",
+      "status": "initialized",
+      "stockReserved": false,
+      "accessCode": "s9mnbk6jzoy0cm2",
+      "authorizationUrl": "https://checkout.paystack.com/s9mnbk6jzoy0cm2",
+      "channels": [
+        "card",
+        "mobile_money"
+      ],
+      "paystack": {
+        "initialized": {
+          "authorization_url": "https://checkout.paystack.com/s9mnbk6jzoy0cm2",
+          "access_code": "s9mnbk6jzoy0cm2",
+          "reference": "ORD-0YVHZZU"
+        }
+      },
+      "reference": "ORD-0YVHZZU",
+      "createdAt": 1787383601331,
+      "updatedAt": 1787383601331
+    },
+    {
+      "provider": "paystack",
+      "orderId": "ORD-S7W63YQ",
+      "orderPayload": {
+        "id": "ORD-S7W63YQ",
+        "orderCode": "ORD-S7W63YQ",
+        "userId": null,
+        "customer": {
+          "name": "Franklin Cudjoe",
+          "email": "lcudjoe73@gmail.com",
+          "phone": "+233551704776"
+        },
+        "email": "lcudjoe73@gmail.com",
+        "phone": "+233551704776",
+        "items": [
+          {
+            "id": "P-93OOP9H",
+            "productId": "P-93OOP9H",
+            "name": "Nmae2",
+            "category": "Dresses",
+            "description": "TEST",
+            "image": "/uploads/1787257522955-d47e70c5-2b5c-401f-9a0d-e6eca66a59d0-img1.jpg",
+            "selectedColor": {
+              "name": "Blue",
+              "value": "#1310e5"
+            },
+            "selectedSize": "XS",
+            "quantity": 1,
+            "qty": 1,
+            "unitPrice": 15,
+            "price": 15,
+            "lineTotal": 15
+          }
+        ],
+        "itemCount": 1,
+        "itemSummary": "Nmae2 (XS/Blue) x 1",
+        "subtotal": 15,
+        "shipping": 0,
+        "discount": {
+          "subtotalDiscount": 0,
+          "shippingDiscount": 0,
+          "totalDiscount": 0
+        },
+        "promotion": null,
+        "delivery": {
+          "type": "pickup",
+          "cost": 0
+        },
+        "total": 15,
+        "amountPaid": 0,
+        "currency": "GHS",
+        "currentStatus": "Payment Pending",
+        "payment": {
+          "provider": "paystack",
+          "reference": "ORD-S7W63YQ",
+          "status": "initialized",
+          "channels": [
+            "card",
+            "mobile_money"
+          ],
+          "accessCode": "has8xk0azl9ax5m",
+          "authorizationUrl": "https://checkout.paystack.com/has8xk0azl9ax5m"
+        },
+        "metadata": {
+          "paystackReference": "ORD-S7W63YQ",
+          "paymentProvider": "paystack"
+        },
+        "createdAt": 1787383392347
+      },
+      "expectedAmount": 1500,
+      "currency": "GHS",
+      "customer": {
+        "name": "Franklin Cudjoe",
+        "email": "lcudjoe73@gmail.com",
+        "phone": "+233551704776"
+      },
+      "receiptInfo": {
+        "name": "Franklin Cudjoe",
+        "email": "lcudjoe73@gmail.com",
+        "phone": "+233551704776"
+      },
+      "smsRecipient": "+233551704776",
+      "status": "initialized",
+      "stockReserved": false,
+      "accessCode": "has8xk0azl9ax5m",
+      "authorizationUrl": "https://checkout.paystack.com/has8xk0azl9ax5m",
+      "channels": [
+        "card",
+        "mobile_money"
+      ],
+      "paystack": {
+        "initialized": {
+          "authorization_url": "https://checkout.paystack.com/has8xk0azl9ax5m",
+          "access_code": "has8xk0azl9ax5m",
+          "reference": "ORD-S7W63YQ"
+        }
+      },
+      "reference": "ORD-S7W63YQ",
+      "createdAt": 1787383393284,
+      "updatedAt": 1787383393284
+    },
+    {
+      "provider": "paystack",
+      "orderId": "ORD-XLNKFWL",
+      "orderPayload": {
+        "id": "ORD-XLNKFWL",
+        "orderCode": "ORD-XLNKFWL",
+        "userId": null,
+        "customer": {
+          "name": "Franklin Cudjoe",
+          "email": "lcudjoe73@gmail.com",
+          "phone": "+233551704776"
+        },
+        "email": "lcudjoe73@gmail.com",
+        "phone": "+233551704776",
+        "items": [
+          {
+            "id": "P-THR1OJV",
+            "productId": "P-THR1OJV",
+            "name": "name",
+            "category": "Dresses",
+            "description": "fabric",
+            "image": "/uploads/1787257490819-0f6e39f1-2ccb-4a82-93bd-f0163f4e08dc-img1.jpg",
+            "selectedColor": null,
+            "selectedSize": "XS",
+            "quantity": 1,
+            "qty": 1,
+            "unitPrice": 14,
+            "price": 14,
+            "lineTotal": 14
+          }
+        ],
+        "itemCount": 1,
+        "itemSummary": "name (XS) x 1",
+        "subtotal": 14,
+        "shipping": 0,
+        "discount": {
+          "subtotalDiscount": 0,
+          "shippingDiscount": 0,
+          "totalDiscount": 0
+        },
+        "promotion": null,
+        "delivery": {
+          "type": "pickup",
+          "cost": 0
+        },
+        "total": 14,
+        "amountPaid": 0,
+        "currency": "GHS",
+        "currentStatus": "Payment Pending",
+        "payment": {
+          "provider": "paystack",
+          "reference": "ORD-XLNKFWL",
+          "status": "initialized",
+          "channels": [
+            "card",
+            "mobile_money"
+          ],
+          "accessCode": "npqpqsgyc3jav7p",
+          "authorizationUrl": "https://checkout.paystack.com/npqpqsgyc3jav7p"
+        },
+        "metadata": {
+          "paystackReference": "ORD-XLNKFWL",
+          "paymentProvider": "paystack"
+        },
+        "createdAt": 1787383284612
+      },
+      "expectedAmount": 1400,
+      "currency": "GHS",
+      "customer": {
+        "name": "Franklin Cudjoe",
+        "email": "lcudjoe73@gmail.com",
+        "phone": "+233551704776"
+      },
+      "receiptInfo": {
+        "name": "Franklin Cudjoe",
+        "email": "lcudjoe73@gmail.com",
+        "phone": "+233551704776"
+      },
+      "smsRecipient": "+233551704776",
+      "status": "initialized",
+      "stockReserved": false,
+      "accessCode": "npqpqsgyc3jav7p",
+      "authorizationUrl": "https://checkout.paystack.com/npqpqsgyc3jav7p",
+      "channels": [
+        "card",
+        "mobile_money"
+      ],
+      "paystack": {
+        "initialized": {
+          "authorization_url": "https://checkout.paystack.com/npqpqsgyc3jav7p",
+          "access_code": "npqpqsgyc3jav7p",
+          "reference": "ORD-XLNKFWL"
+        }
+      },
+      "reference": "ORD-XLNKFWL",
+      "createdAt": 1787383287683,
+      "updatedAt": 1787383287683
+    },
+    {
+      "provider": "paystack",
+      "orderId": "ORD-3V3RNEC",
+      "orderPayload": {
+        "id": "ORD-3V3RNEC",
+        "orderCode": "ORD-3V3RNEC",
+        "userId": null,
+        "customer": {
+          "name": "Franklin Cudjoe",
+          "email": "lcudjoe73@gmail.com",
+          "phone": "+233551704776"
+        },
+        "email": "lcudjoe73@gmail.com",
+        "phone": "+233551704776",
+        "items": [
+          {
+            "id": "P-THR1OJV",
+            "productId": "P-THR1OJV",
+            "name": "name",
+            "category": "Dresses",
+            "description": "fabric",
+            "image": "/uploads/1787257490819-0f6e39f1-2ccb-4a82-93bd-f0163f4e08dc-img1.jpg",
+            "selectedColor": null,
+            "selectedSize": "L",
+            "quantity": 1,
+            "qty": 1,
+            "unitPrice": 14,
+            "price": 14,
+            "lineTotal": 14
+          }
+        ],
+        "itemCount": 1,
+        "itemSummary": "name (L) x 1",
+        "subtotal": 14,
+        "shipping": 0,
+        "discount": {
+          "subtotalDiscount": 0,
+          "shippingDiscount": 0,
+          "totalDiscount": 0
+        },
+        "promotion": null,
+        "delivery": {
+          "type": "pickup",
+          "cost": 0
+        },
+        "total": 14,
+        "amountPaid": 0,
+        "currency": "GHS",
+        "currentStatus": "Payment Pending",
+        "payment": {
+          "provider": "paystack",
+          "reference": "ORD-3V3RNEC",
+          "status": "initialized",
+          "channels": [
+            "card",
+            "mobile_money"
+          ],
+          "accessCode": "g9wbiepp5ye2ek6",
+          "authorizationUrl": "https://checkout.paystack.com/g9wbiepp5ye2ek6"
+        },
+        "metadata": {
+          "paystackReference": "ORD-3V3RNEC",
+          "paymentProvider": "paystack"
+        },
+        "createdAt": 1787383183458
+      },
+      "expectedAmount": 1400,
+      "currency": "GHS",
+      "customer": {
+        "name": "Franklin Cudjoe",
+        "email": "lcudjoe73@gmail.com",
+        "phone": "+233551704776"
+      },
+      "receiptInfo": {
+        "name": "Franklin Cudjoe",
+        "email": "lcudjoe73@gmail.com",
+        "phone": "+233551704776"
+      },
+      "smsRecipient": "+233551704776",
+      "status": "initialized",
+      "stockReserved": false,
+      "accessCode": "g9wbiepp5ye2ek6",
+      "authorizationUrl": "https://checkout.paystack.com/g9wbiepp5ye2ek6",
+      "channels": [
+        "card",
+        "mobile_money"
+      ],
+      "paystack": {
+        "initialized": {
+          "authorization_url": "https://checkout.paystack.com/g9wbiepp5ye2ek6",
+          "access_code": "g9wbiepp5ye2ek6",
+          "reference": "ORD-3V3RNEC"
+        }
+      },
+      "reference": "ORD-3V3RNEC",
+      "createdAt": 1787383185990,
+      "updatedAt": 1787383185990
+    },
+    {
+      "provider": "paystack",
+      "orderId": "ORD-O1BXV2G",
+      "orderPayload": {
+        "id": "ORD-O1BXV2G",
+        "orderCode": "ORD-O1BXV2G",
+        "userId": null,
+        "customer": {
+          "name": "Franklin Cudjoe",
+          "email": "lcudjoe73@gmail.com",
+          "phone": "+233551704776"
+        },
+        "email": "lcudjoe73@gmail.com",
+        "phone": "+233551704776",
+        "items": [
+          {
+            "id": "P-93OOP9H",
+            "productId": "P-93OOP9H",
+            "name": "Nmae2",
+            "category": "Dresses",
+            "description": "TEST",
+            "image": "/uploads/1787257522955-d47e70c5-2b5c-401f-9a0d-e6eca66a59d0-img1.jpg",
+            "selectedColor": {
+              "name": "Red",
+              "value": "#f5192f"
+            },
+            "selectedSize": "XS",
+            "quantity": 1,
+            "qty": 1,
+            "unitPrice": 15,
+            "price": 15,
+            "lineTotal": 15
+          }
+        ],
+        "itemCount": 1,
+        "itemSummary": "Nmae2 (XS/Red) x 1",
+        "subtotal": 15,
+        "shipping": 0,
+        "discount": {
+          "subtotalDiscount": 0,
+          "shippingDiscount": 0,
+          "totalDiscount": 0
+        },
+        "promotion": null,
+        "delivery": {
+          "type": "pickup",
+          "cost": 0
+        },
+        "total": 15,
+        "amountPaid": 0,
+        "currency": "GHS",
+        "currentStatus": "Payment Pending",
+        "payment": {
+          "provider": "paystack",
+          "reference": "ORD-O1BXV2G",
+          "status": "initialized",
+          "channels": [
+            "card",
+            "mobile_money"
+          ],
+          "accessCode": "31zit0xp0lhzhqf",
+          "authorizationUrl": "https://checkout.paystack.com/31zit0xp0lhzhqf"
+        },
+        "metadata": {
+          "paystackReference": "ORD-O1BXV2G",
+          "paymentProvider": "paystack"
+        },
+        "createdAt": 1787358391658
+      },
+      "expectedAmount": 1500,
+      "currency": "GHS",
+      "customer": {
+        "name": "Franklin Cudjoe",
+        "email": "lcudjoe73@gmail.com",
+        "phone": "+233551704776"
+      },
+      "receiptInfo": {
+        "name": "Franklin Cudjoe",
+        "email": "lcudjoe73@gmail.com",
+        "phone": "+233551704776"
+      },
+      "smsRecipient": "+233551704776",
+      "status": "initialized",
+      "stockReserved": false,
+      "accessCode": "31zit0xp0lhzhqf",
+      "authorizationUrl": "https://checkout.paystack.com/31zit0xp0lhzhqf",
+      "channels": [
+        "card",
+        "mobile_money"
+      ],
+      "paystack": {
+        "initialized": {
+          "authorization_url": "https://checkout.paystack.com/31zit0xp0lhzhqf",
+          "access_code": "31zit0xp0lhzhqf",
+          "reference": "ORD-O1BXV2G"
+        }
+      },
+      "reference": "ORD-O1BXV2G",
+      "createdAt": 1787358392591,
+      "updatedAt": 1787358392591
+    },
+    {
+      "provider": "paystack",
+      "orderId": "ORD-ZNXIAPM",
+      "orderPayload": {
+        "id": "ORD-ZNXIAPM",
+        "orderCode": "ORD-ZNXIAPM",
+        "userId": null,
+        "customer": {
+          "name": "Franklin Cudjoe",
+          "email": "lcudjoe73@gmail.com",
+          "phone": "+233551704776"
+        },
+        "email": "lcudjoe73@gmail.com",
+        "phone": "+233551704776",
+        "items": [
+          {
+            "id": "P-THR1OJV",
+            "productId": "P-THR1OJV",
+            "name": "name",
+            "category": "Dresses",
+            "description": "fabric",
+            "image": "/uploads/1787257490819-0f6e39f1-2ccb-4a82-93bd-f0163f4e08dc-img1.jpg",
+            "selectedColor": null,
+            "selectedSize": "XS",
+            "quantity": 1,
+            "qty": 1,
+            "unitPrice": 14,
+            "price": 14,
+            "lineTotal": 14
+          }
+        ],
+        "itemCount": 1,
+        "itemSummary": "name x 1",
+        "subtotal": 14,
+        "shipping": 0,
+        "discount": {
+          "subtotalDiscount": 0,
+          "shippingDiscount": 0,
+          "totalDiscount": 0
+        },
+        "promotion": null,
+        "delivery": {
+          "type": "pickup",
+          "cost": 0
+        },
+        "total": 14,
+        "amountPaid": 0,
+        "currency": "GHS",
+        "currentStatus": "Payment Pending",
+        "payment": {
+          "provider": "paystack",
+          "reference": "ORD-ZNXIAPM",
+          "status": "initialized",
+          "channels": [
+            "card",
+            "mobile_money"
+          ],
+          "accessCode": "0sq2wgy382x49d4",
+          "authorizationUrl": "https://checkout.paystack.com/0sq2wgy382x49d4"
+        },
+        "metadata": {
+          "paystackReference": "ORD-ZNXIAPM",
+          "paymentProvider": "paystack"
+        },
+        "createdAt": 1787357614676
+      },
+      "expectedAmount": 1400,
+      "currency": "GHS",
+      "customer": {
+        "name": "Franklin Cudjoe",
+        "email": "lcudjoe73@gmail.com",
+        "phone": "+233551704776"
+      },
+      "status": "initialized",
+      "stockReserved": false,
+      "accessCode": "0sq2wgy382x49d4",
+      "authorizationUrl": "https://checkout.paystack.com/0sq2wgy382x49d4",
+      "channels": [
+        "card",
+        "mobile_money"
+      ],
+      "paystack": {
+        "initialized": {
+          "authorization_url": "https://checkout.paystack.com/0sq2wgy382x49d4",
+          "access_code": "0sq2wgy382x49d4",
+          "reference": "ORD-ZNXIAPM"
+        }
+      },
+      "reference": "ORD-ZNXIAPM",
+      "createdAt": 1787357615297,
+      "updatedAt": 1787357615297
+    },
+    {
+      "provider": "paystack",
+      "orderId": "ORD-XE0HGXX",
+      "orderPayload": {
+        "id": "ORD-XE0HGXX",
+        "orderCode": "ORD-XE0HGXX",
+        "userId": null,
+        "customer": {
+          "name": "Franklin Cudjoe",
+          "email": "lcudjoe73@gmail.com",
+          "phone": "+233551704776"
+        },
+        "email": "lcudjoe73@gmail.com",
+        "phone": "+233551704776",
+        "items": [
+          {
+            "id": "P-THR1OJV",
+            "productId": "P-THR1OJV",
+            "name": "name",
+            "category": "Dresses",
+            "description": "fabric",
+            "image": "/uploads/1787257490819-0f6e39f1-2ccb-4a82-93bd-f0163f4e08dc-img1.jpg",
+            "selectedColor": null,
+            "selectedSize": "XS",
+            "quantity": 1,
+            "qty": 1,
+            "unitPrice": 14,
+            "price": 14,
+            "lineTotal": 14
+          }
+        ],
+        "itemCount": 1,
+        "itemSummary": "name x 1",
+        "subtotal": 14,
+        "shipping": 0,
+        "discount": {
+          "subtotalDiscount": 0,
+          "shippingDiscount": 0,
+          "totalDiscount": 0
+        },
+        "promotion": null,
+        "delivery": {
+          "type": "pickup",
+          "cost": 0
+        },
+        "total": 14,
+        "amountPaid": 0,
+        "currency": "GHS",
+        "currentStatus": "Payment Pending",
+        "payment": {
+          "provider": "paystack",
+          "reference": "ORD-XE0HGXX",
+          "status": "initialized",
+          "channels": [
+            "card",
+            "mobile_money"
+          ],
+          "accessCode": "vejq0ezw8pmx15q",
+          "authorizationUrl": "https://checkout.paystack.com/vejq0ezw8pmx15q"
+        },
+        "metadata": {
+          "paystackReference": "ORD-XE0HGXX",
+          "paymentProvider": "paystack"
+        },
+        "createdAt": 1787357454276
+      },
+      "expectedAmount": 1400,
+      "currency": "GHS",
+      "customer": {
+        "name": "Franklin Cudjoe",
+        "email": "lcudjoe73@gmail.com",
+        "phone": "+233551704776"
+      },
+      "status": "initialized",
+      "stockReserved": false,
+      "accessCode": "vejq0ezw8pmx15q",
+      "authorizationUrl": "https://checkout.paystack.com/vejq0ezw8pmx15q",
+      "channels": [
+        "card",
+        "mobile_money"
+      ],
+      "paystack": {
+        "initialized": {
+          "authorization_url": "https://checkout.paystack.com/vejq0ezw8pmx15q",
+          "access_code": "vejq0ezw8pmx15q",
+          "reference": "ORD-XE0HGXX"
+        }
+      },
+      "reference": "ORD-XE0HGXX",
+      "createdAt": 1787357455085,
+      "updatedAt": 1787357455085
+    },
+    {
+      "provider": "paystack",
+      "orderId": "ORD-VSTF7A6",
+      "orderPayload": {
+        "id": "ORD-VSTF7A6",
+        "orderCode": "ORD-VSTF7A6",
+        "userId": null,
+        "customer": {
+          "name": "Franklin Cudjoe",
+          "email": "lcudjoe73@gmail.com",
+          "phone": "+233551704776"
+        },
+        "email": "lcudjoe73@gmail.com",
+        "phone": "+233551704776",
+        "items": [
+          {
+            "id": "P-THR1OJV",
+            "productId": "P-THR1OJV",
+            "name": "name",
+            "category": "Dresses",
+            "description": "fabric",
+            "image": "/uploads/1787257490819-0f6e39f1-2ccb-4a82-93bd-f0163f4e08dc-img1.jpg",
+            "selectedColor": null,
+            "selectedSize": "XS",
+            "quantity": 1,
+            "qty": 1,
+            "unitPrice": 14,
+            "price": 14,
+            "lineTotal": 14
+          }
+        ],
+        "itemCount": 1,
+        "itemSummary": "name x 1",
+        "subtotal": 14,
+        "shipping": 0,
+        "discount": {
+          "subtotalDiscount": 0,
+          "shippingDiscount": 0,
+          "totalDiscount": 0
+        },
+        "promotion": null,
+        "delivery": {
+          "type": "pickup",
+          "cost": 0
+        },
+        "total": 14,
+        "amountPaid": 0,
+        "currency": "GHS",
+        "currentStatus": "Payment Pending",
+        "payment": {
+          "provider": "paystack",
+          "reference": "ORD-VSTF7A6",
+          "status": "initialized",
+          "channels": [
+            "card",
+            "mobile_money"
+          ],
+          "accessCode": "ytbdr3qzrqzfqhk",
+          "authorizationUrl": "https://checkout.paystack.com/ytbdr3qzrqzfqhk"
+        },
+        "metadata": {
+          "paystackReference": "ORD-VSTF7A6",
+          "paymentProvider": "paystack"
+        },
+        "createdAt": 1787356695758
+      },
+      "expectedAmount": 1400,
+      "currency": "GHS",
+      "customer": {
+        "name": "Franklin Cudjoe",
+        "email": "lcudjoe73@gmail.com",
+        "phone": "+233551704776"
+      },
+      "status": "initialized",
+      "stockReserved": false,
+      "accessCode": "ytbdr3qzrqzfqhk",
+      "authorizationUrl": "https://checkout.paystack.com/ytbdr3qzrqzfqhk",
+      "channels": [
+        "card",
+        "mobile_money"
+      ],
+      "paystack": {
+        "initialized": {
+          "authorization_url": "https://checkout.paystack.com/ytbdr3qzrqzfqhk",
+          "access_code": "ytbdr3qzrqzfqhk",
+          "reference": "ORD-VSTF7A6"
+        }
+      },
+      "reference": "ORD-VSTF7A6",
+      "createdAt": 1787356696404,
+      "updatedAt": 1787356696404
+    },
+    {
+      "provider": "paystack",
+      "orderId": "ORD-20MXTDJ",
+      "orderPayload": {
+        "id": "ORD-20MXTDJ",
+        "orderCode": "ORD-20MXTDJ",
+        "userId": null,
+        "customer": {
+          "name": "lcudjoe73",
+          "email": "lcudjoe73@gmail.com",
+          "phone": "+233551704776"
+        },
+        "email": "lcudjoe73@gmail.com",
+        "phone": "+233551704776",
+        "items": [
+          {
+            "id": "P-THR1OJV",
+            "productId": "P-THR1OJV",
+            "name": "name",
+            "category": "Dresses",
+            "description": "fabric",
+            "image": "/uploads/1787257490819-0f6e39f1-2ccb-4a82-93bd-f0163f4e08dc-img1.jpg",
+            "selectedColor": null,
+            "selectedSize": "XS",
+            "quantity": 1,
+            "qty": 1,
+            "unitPrice": 14,
+            "price": 14,
+            "lineTotal": 14
+          }
+        ],
+        "itemCount": 1,
+        "itemSummary": "name x 1",
+        "subtotal": 14,
+        "shipping": 0,
+        "discount": {
+          "subtotalDiscount": 0,
+          "shippingDiscount": 0,
+          "totalDiscount": 0
+        },
+        "promotion": null,
+        "delivery": {
+          "type": "pickup",
+          "cost": 0
+        },
+        "total": 14,
+        "amountPaid": 0,
+        "currency": "GHS",
+        "currentStatus": "Payment Pending",
+        "payment": {
+          "provider": "paystack",
+          "reference": "ORD-20MXTDJ",
+          "status": "initialized",
+          "channels": [
+            "card",
+            "mobile_money"
+          ],
+          "accessCode": "fy22lqul7otj9vk",
+          "authorizationUrl": "https://checkout.paystack.com/fy22lqul7otj9vk"
+        },
+        "metadata": {
+          "paystackReference": "ORD-20MXTDJ",
+          "paymentProvider": "paystack"
+        },
+        "createdAt": 1787356091505
+      },
+      "expectedAmount": 1400,
+      "currency": "GHS",
+      "customer": {
+        "name": "lcudjoe73",
+        "email": "lcudjoe73@gmail.com",
+        "phone": "+233551704776"
+      },
+      "status": "initialized",
+      "stockReserved": false,
+      "accessCode": "fy22lqul7otj9vk",
+      "authorizationUrl": "https://checkout.paystack.com/fy22lqul7otj9vk",
+      "channels": [
+        "card",
+        "mobile_money"
+      ],
+      "paystack": {
+        "initialized": {
+          "authorization_url": "https://checkout.paystack.com/fy22lqul7otj9vk",
+          "access_code": "fy22lqul7otj9vk",
+          "reference": "ORD-20MXTDJ"
+        }
+      },
+      "reference": "ORD-20MXTDJ",
+      "createdAt": 1787356092190,
+      "updatedAt": 1787356092190
+    },
+    {
+      "provider": "paystack",
+      "orderId": "ORD-D1Y7EET",
+      "orderPayload": {
+        "id": "ORD-D1Y7EET",
+        "orderCode": "ORD-D1Y7EET",
+        "userId": null,
+        "customer": {
+          "name": "lcudjoe73",
+          "email": "lcudjoe73@gmail.com",
+          "phone": "+233551704776"
+        },
+        "email": "lcudjoe73@gmail.com",
+        "phone": "+233551704776",
+        "items": [
+          {
+            "id": "P-93OOP9H",
+            "productId": "P-93OOP9H",
+            "name": "Nmae2",
+            "category": "Dresses",
+            "description": "TEST",
+            "image": "/uploads/1787257522955-d47e70c5-2b5c-401f-9a0d-e6eca66a59d0-img1.jpg",
+            "selectedColor": null,
+            "selectedSize": "XS",
+            "quantity": 1,
+            "qty": 1,
+            "unitPrice": 15,
+            "price": 15,
+            "lineTotal": 15
+          }
+        ],
+        "itemCount": 1,
+        "itemSummary": "Nmae2 x 1",
+        "subtotal": 15,
+        "shipping": 0,
+        "discount": {
+          "subtotalDiscount": 0,
+          "shippingDiscount": 0,
+          "totalDiscount": 0
+        },
+        "promotion": null,
+        "delivery": {
+          "type": "pickup",
+          "cost": 0
+        },
+        "total": 15,
+        "amountPaid": 0,
+        "currency": "GHS",
+        "currentStatus": "Payment Pending",
+        "payment": {
+          "provider": "paystack",
+          "reference": "ORD-D1Y7EET",
+          "status": "initialized",
+          "channels": [
+            "card",
+            "mobile_money"
+          ],
+          "accessCode": "z1d8lvmm02a6ic1",
+          "authorizationUrl": "https://checkout.paystack.com/z1d8lvmm02a6ic1"
+        },
+        "metadata": {
+          "paystackReference": "ORD-D1Y7EET",
+          "paymentProvider": "paystack"
+        },
+        "createdAt": 1787355935240
+      },
+      "expectedAmount": 1500,
+      "currency": "GHS",
+      "customer": {
+        "name": "lcudjoe73",
+        "email": "lcudjoe73@gmail.com",
+        "phone": "+233551704776"
+      },
+      "status": "initialized",
+      "stockReserved": false,
+      "accessCode": "z1d8lvmm02a6ic1",
+      "authorizationUrl": "https://checkout.paystack.com/z1d8lvmm02a6ic1",
+      "channels": [
+        "card",
+        "mobile_money"
+      ],
+      "paystack": {
+        "initialized": {
+          "authorization_url": "https://checkout.paystack.com/z1d8lvmm02a6ic1",
+          "access_code": "z1d8lvmm02a6ic1",
+          "reference": "ORD-D1Y7EET"
+        }
+      },
+      "reference": "ORD-D1Y7EET",
+      "createdAt": 1787355935829,
+      "updatedAt": 1787355935829
+    },
+    {
+      "provider": "paystack",
+      "orderId": "ORD-8JQUTOV",
+      "orderPayload": {
+        "id": "ORD-8JQUTOV",
+        "orderCode": "ORD-8JQUTOV",
+        "userId": null,
+        "customer": {
+          "name": "Franklin Cudjoe",
+          "email": "lcudjoe73@gmail.com",
+          "phone": "+233551704776"
+        },
+        "email": "lcudjoe73@gmail.com",
+        "phone": "+233551704776",
+        "items": [
+          {
+            "id": "P-93OOP9H",
+            "productId": "P-93OOP9H",
+            "name": "Nmae2",
+            "category": "Dresses",
+            "description": "TEST",
+            "image": "/uploads/1787257522955-d47e70c5-2b5c-401f-9a0d-e6eca66a59d0-img1.jpg",
+            "selectedColor": null,
+            "selectedSize": "XS",
+            "quantity": 2,
+            "qty": 2,
+            "unitPrice": 15,
+            "price": 15,
+            "lineTotal": 30
+          }
+        ],
+        "itemCount": 2,
+        "itemSummary": "Nmae2 x 2",
+        "subtotal": 30,
+        "shipping": 0,
+        "discount": {
+          "subtotalDiscount": 0,
+          "shippingDiscount": 0,
+          "totalDiscount": 0
+        },
+        "promotion": null,
+        "delivery": {
+          "type": "pickup",
+          "cost": 0
+        },
+        "total": 30,
+        "amountPaid": 0,
+        "currency": "GHS",
+        "currentStatus": "Payment Pending",
+        "payment": {
+          "provider": "paystack",
+          "reference": "ORD-8JQUTOV",
+          "status": "initialized",
+          "channels": [
+            "card",
+            "mobile_money"
+          ],
+          "accessCode": "7d9b4srryb6k7nk",
+          "authorizationUrl": "https://checkout.paystack.com/7d9b4srryb6k7nk"
+        },
+        "metadata": {
+          "paystackReference": "ORD-8JQUTOV",
+          "paymentProvider": "paystack"
+        },
+        "createdAt": 1787354914454
+      },
+      "expectedAmount": 3000,
+      "currency": "GHS",
+      "customer": {
+        "name": "Franklin Cudjoe",
+        "email": "lcudjoe73@gmail.com",
+        "phone": "+233551704776"
+      },
+      "status": "initialized",
+      "stockReserved": false,
+      "accessCode": "7d9b4srryb6k7nk",
+      "authorizationUrl": "https://checkout.paystack.com/7d9b4srryb6k7nk",
+      "channels": [
+        "card",
+        "mobile_money"
+      ],
+      "paystack": {
+        "initialized": {
+          "authorization_url": "https://checkout.paystack.com/7d9b4srryb6k7nk",
+          "access_code": "7d9b4srryb6k7nk",
+          "reference": "ORD-8JQUTOV"
+        }
+      },
+      "reference": "ORD-8JQUTOV",
+      "createdAt": 1787354915522,
+      "updatedAt": 1787354915522
+    },
+    {
+      "provider": "dev_bypass",
+      "orderId": "ORD-SUN5BIU",
+      "orderPayload": {
+        "id": "ORD-SUN5BIU",
+        "orderCode": "ORD-SUN5BIU",
+        "userId": null,
+        "customer": {
+          "name": "Franklin Cudjoe",
+          "email": "lcudjoe73@gmail.com",
+          "phone": "+233551704776"
+        },
+        "email": "lcudjoe73@gmail.com",
+        "phone": "+233551704776",
+        "items": [
+          {
+            "id": "P-93OOP9H",
+            "productId": "P-93OOP9H",
+            "name": "Nmae2",
+            "category": "Dresses",
+            "description": "TEST",
+            "image": "/uploads/1787257522955-d47e70c5-2b5c-401f-9a0d-e6eca66a59d0-img1.jpg",
+            "selectedColor": null,
+            "selectedSize": "XS",
+            "quantity": 3,
+            "qty": 3,
+            "unitPrice": 15,
+            "price": 15,
+            "lineTotal": 45
+          }
+        ],
+        "itemCount": 3,
+        "itemSummary": "Nmae2 x 3",
+        "subtotal": 45,
+        "shipping": 0,
+        "discount": {
+          "subtotalDiscount": 0,
+          "shippingDiscount": 0,
+          "totalDiscount": 0
+        },
+        "promotion": null,
+        "delivery": {
+          "type": "pickup",
+          "cost": 0
+        },
+        "total": 45,
+        "amountPaid": 45,
+        "currency": "GHS",
+        "currentStatus": "Placed",
+        "payment": {
+          "provider": "dev_bypass",
+          "reference": "ORD-SUN5BIU",
+          "status": "success",
+          "amount": 45,
+          "currency": "GHS",
+          "method": "Development payment bypass",
+          "verifiedAt": 1787352666299
+        },
+        "metadata": {
+          "paystackReference": "ORD-SUN5BIU",
+          "paymentProvider": "dev_bypass",
+          "devPaymentBypass": true
+        },
+        "createdAt": 1787352666299
+      },
+      "expectedAmount": 4500,
+      "currency": "GHS",
+      "customer": {
+        "name": "Franklin Cudjoe",
+        "email": "lcudjoe73@gmail.com",
+        "phone": "+233551704776"
+      },
+      "status": "success",
+      "stockReserved": false,
+      "paidAt": 1787352666299,
+      "devPaymentBypass": true,
+      "reference": "ORD-SUN5BIU",
+      "createdAt": 1787352666299,
+      "updatedAt": 1787352670315,
+      "notifications": {
+        "orderCodeSms": {
+          "provider": "arkesel",
+          "messageId": null,
+          "status": "success",
+          "providerMessage": null,
+          "providerResponse": {
+            "data": [
+              {
+                "id": "557d090a-eb5e-4d73-8f11-db45da52a8e0",
+                "recipient": "[redacted]"
+              }
+            ],
+            "status": "success",
+            "main_balance": 0.2,
+            "sms_balance": 7143
+          },
+          "deliveryStatus": "accepted_by_provider",
+          "callbackConfigured": false,
+          "creditsUsed": null,
+          "to": "+233551704776",
+          "messagePreview": "Thank you for your purchase. Payment confirmed for GHS 45.00. Your order code is ORD-SUN5BIU. Use Track on the website for delivery updates.",
+          "sentAt": 1787352670315
+        }
+      }
+    },
+    {
+      "provider": "paystack",
+      "orderId": "ORD-BIJJB6Z",
+      "orderPayload": {
+        "id": "ORD-BIJJB6Z",
+        "orderCode": "ORD-BIJJB6Z",
+        "userId": null,
+        "customer": {
+          "name": "Franklin Cudjoe",
+          "email": "lcudjoe73@gmail.com",
+          "phone": "+233551704776"
+        },
+        "email": "lcudjoe73@gmail.com",
+        "phone": "+233551704776",
+        "items": [
+          {
+            "id": "P-THR1OJV",
+            "productId": "P-THR1OJV",
+            "name": "name",
+            "category": "Dresses",
+            "description": "fabric",
+            "image": "/uploads/1787257490819-0f6e39f1-2ccb-4a82-93bd-f0163f4e08dc-img1.jpg",
+            "selectedColor": null,
+            "selectedSize": "XS",
+            "quantity": 1,
+            "qty": 1,
+            "unitPrice": 14,
+            "price": 14,
+            "lineTotal": 14
+          }
+        ],
+        "itemCount": 1,
+        "itemSummary": "name x 1",
+        "subtotal": 14,
+        "shipping": 0,
+        "discount": {
+          "subtotalDiscount": 0,
+          "shippingDiscount": 0,
+          "totalDiscount": 0
+        },
+        "promotion": null,
+        "delivery": {
+          "type": "pickup",
+          "cost": 0
+        },
+        "total": 14,
+        "amountPaid": 0,
+        "currency": "GHS",
+        "currentStatus": "Payment Pending",
+        "payment": {
+          "provider": "paystack",
+          "reference": "ORD-BIJJB6Z",
+          "status": "initialized",
+          "channels": [
+            "card",
+            "mobile_money"
+          ],
+          "accessCode": "by8hnpy7ycwg8d9",
+          "authorizationUrl": "https://checkout.paystack.com/by8hnpy7ycwg8d9"
+        },
+        "metadata": {
+          "paystackReference": "ORD-BIJJB6Z",
+          "paymentProvider": "paystack"
+        },
+        "createdAt": 1787352610193
+      },
+      "expectedAmount": 1400,
+      "currency": "GHS",
+      "customer": {
+        "name": "Franklin Cudjoe",
+        "email": "lcudjoe73@gmail.com",
+        "phone": "+233551704776"
+      },
+      "status": "initialized",
+      "stockReserved": false,
+      "accessCode": "by8hnpy7ycwg8d9",
+      "authorizationUrl": "https://checkout.paystack.com/by8hnpy7ycwg8d9",
+      "channels": [
+        "card",
+        "mobile_money"
+      ],
+      "paystack": {
+        "initialized": {
+          "authorization_url": "https://checkout.paystack.com/by8hnpy7ycwg8d9",
+          "access_code": "by8hnpy7ycwg8d9",
+          "reference": "ORD-BIJJB6Z"
+        }
+      },
+      "reference": "ORD-BIJJB6Z",
+      "createdAt": 1787352611363,
+      "updatedAt": 1787352611363
+    },
+    {
+      "provider": "dev_bypass",
+      "orderId": "ORD-NZQND43",
+      "orderPayload": {
+        "id": "ORD-NZQND43",
+        "orderCode": "ORD-NZQND43",
+        "userId": null,
+        "customer": {
+          "name": "Franklin Cudjoe",
+          "email": "lcudjoe73@gmail.com",
+          "phone": "+233551704776"
+        },
+        "email": "lcudjoe73@gmail.com",
+        "phone": "+233551704776",
+        "items": [
+          {
+            "id": "P-93OOP9H",
+            "productId": "P-93OOP9H",
+            "name": "Nmae2",
+            "category": "Dresses",
+            "description": "TEST",
+            "image": "/uploads/1787257522955-d47e70c5-2b5c-401f-9a0d-e6eca66a59d0-img1.jpg",
+            "selectedColor": null,
+            "selectedSize": "XS",
+            "quantity": 1,
+            "qty": 1,
+            "unitPrice": 15,
+            "price": 15,
+            "lineTotal": 15
+          },
+          {
+            "id": "P-THR1OJV",
+            "productId": "P-THR1OJV",
+            "name": "name",
+            "category": "Dresses",
+            "description": "fabric",
+            "image": "/uploads/1787257490819-0f6e39f1-2ccb-4a82-93bd-f0163f4e08dc-img1.jpg",
+            "selectedColor": null,
+            "selectedSize": "XS",
+            "quantity": 1,
+            "qty": 1,
+            "unitPrice": 14,
+            "price": 14,
+            "lineTotal": 14
+          }
+        ],
+        "itemCount": 2,
+        "itemSummary": "Nmae2 x 1, name x 1",
+        "subtotal": 29,
+        "shipping": 0,
+        "discount": {
+          "subtotalDiscount": 0,
+          "shippingDiscount": 0,
+          "totalDiscount": 0
+        },
+        "promotion": null,
+        "delivery": {
+          "type": "pickup",
+          "cost": 0
+        },
+        "total": 29,
+        "amountPaid": 29,
+        "currency": "GHS",
+        "currentStatus": "Placed",
+        "payment": {
+          "provider": "dev_bypass",
+          "reference": "ORD-NZQND43",
+          "status": "success",
+          "amount": 29,
+          "currency": "GHS",
+          "method": "Development payment bypass",
+          "verifiedAt": 1787351955716
+        },
+        "metadata": {
+          "paystackReference": "ORD-NZQND43",
+          "paymentProvider": "dev_bypass",
+          "devPaymentBypass": true
+        },
+        "createdAt": 1787351955716
+      },
+      "expectedAmount": 2900,
+      "currency": "GHS",
+      "customer": {
+        "name": "Franklin Cudjoe",
+        "email": "lcudjoe73@gmail.com",
+        "phone": "+233551704776"
+      },
+      "status": "success",
+      "stockReserved": false,
+      "paidAt": 1787351955716,
+      "devPaymentBypass": true,
+      "reference": "ORD-NZQND43",
+      "createdAt": 1787351955716,
+      "updatedAt": 1787351958660,
+      "notifications": {
+        "orderCodeSms": {
+          "provider": "arkesel",
+          "messageId": null,
+          "status": "success",
+          "to": "+233551704776",
+          "messagePreview": "Thank you for your purchase. Payment confirmed for GHS 29.00. Your order code is ORD-NZQND43. Use Track on the website for delivery updates.",
+          "sentAt": 1787351958660
+        }
+      }
+    },
+    {
+      "provider": "dev_bypass",
+      "orderId": "ORD-XUBLUSH",
+      "orderPayload": {
+        "id": "ORD-XUBLUSH",
+        "orderCode": "ORD-XUBLUSH",
+        "userId": null,
+        "customer": {
+          "name": "Franklin Cudjoe",
+          "email": "lcudjoe73@gmail.com",
+          "phone": "+233551704776"
+        },
+        "email": "lcudjoe73@gmail.com",
+        "phone": "+233551704776",
+        "items": [
+          {
+            "id": "P-THR1OJV",
+            "productId": "P-THR1OJV",
+            "name": "name",
+            "category": "Dresses",
+            "description": "fabric",
+            "image": "/uploads/1787257490819-0f6e39f1-2ccb-4a82-93bd-f0163f4e08dc-img1.jpg",
+            "selectedColor": null,
+            "selectedSize": "XS",
+            "quantity": 1,
+            "qty": 1,
+            "unitPrice": 14,
+            "price": 14,
+            "lineTotal": 14
+          }
+        ],
+        "itemCount": 1,
+        "itemSummary": "name x 1",
+        "subtotal": 14,
+        "shipping": 0,
+        "discount": {
+          "subtotalDiscount": 0,
+          "shippingDiscount": 0,
+          "totalDiscount": 0
+        },
+        "promotion": null,
+        "delivery": {
+          "type": "pickup",
+          "cost": 0
+        },
+        "total": 14,
+        "amountPaid": 14,
+        "currency": "GHS",
+        "currentStatus": "Placed",
+        "payment": {
+          "provider": "dev_bypass",
+          "reference": "ORD-XUBLUSH",
+          "status": "success",
+          "amount": 14,
+          "currency": "GHS",
+          "method": "Development payment bypass",
+          "verifiedAt": 1787351780693
+        },
+        "metadata": {
+          "paystackReference": "ORD-XUBLUSH",
+          "paymentProvider": "dev_bypass",
+          "devPaymentBypass": true
+        },
+        "createdAt": 1787351780693
+      },
+      "expectedAmount": 1400,
+      "currency": "GHS",
+      "customer": {
+        "name": "Franklin Cudjoe",
+        "email": "lcudjoe73@gmail.com",
+        "phone": "+233551704776"
+      },
+      "status": "success",
+      "stockReserved": false,
+      "paidAt": 1787351780693,
+      "devPaymentBypass": true,
+      "reference": "ORD-XUBLUSH",
+      "createdAt": 1787351780663,
+      "updatedAt": 1787351784810,
+      "notifications": {
+        "orderCodeSms": {
+          "provider": "arkesel",
+          "messageId": null,
+          "status": "success",
+          "to": "+233551704776",
+          "messagePreview": "Thank you for your purchase. Payment confirmed for GHS 14.00. Your order code is ORD-XUBLUSH. Use Track on the website for delivery updates.",
+          "sentAt": 1787351784810
+        }
+      }
+    },
+    {
+      "provider": "dev_bypass",
+      "orderId": "ORD-AWZCEFS",
+      "orderPayload": {
+        "id": "ORD-AWZCEFS",
+        "orderCode": "ORD-AWZCEFS",
+        "userId": null,
+        "customer": {
+          "name": "Franklin Cudjoe",
+          "email": "lcudjoe73@gmail.com",
+          "phone": "+233551704776"
+        },
+        "email": "lcudjoe73@gmail.com",
+        "phone": "+233551704776",
+        "items": [
+          {
+            "id": "P-THR1OJV",
+            "productId": "P-THR1OJV",
+            "name": "name",
+            "category": "Dresses",
+            "description": "fabric",
+            "image": "/uploads/1787257490819-0f6e39f1-2ccb-4a82-93bd-f0163f4e08dc-img1.jpg",
+            "selectedColor": null,
+            "selectedSize": "XS",
+            "quantity": 1,
+            "qty": 1,
+            "unitPrice": 14,
+            "price": 14,
+            "lineTotal": 14
+          }
+        ],
+        "itemCount": 1,
+        "itemSummary": "name x 1",
+        "subtotal": 14,
+        "shipping": 0,
+        "discount": {
+          "subtotalDiscount": 0,
+          "shippingDiscount": 0,
+          "totalDiscount": 0
+        },
+        "promotion": null,
+        "delivery": {
+          "type": "pickup",
+          "cost": 0
+        },
+        "total": 14,
+        "amountPaid": 14,
+        "currency": "GHS",
+        "currentStatus": "Placed",
+        "payment": {
+          "provider": "dev_bypass",
+          "reference": "ORD-AWZCEFS",
+          "status": "success",
+          "amount": 14,
+          "currency": "GHS",
+          "method": "Development payment bypass",
+          "verifiedAt": 1787351544326
+        },
+        "metadata": {
+          "paystackReference": "ORD-AWZCEFS",
+          "paymentProvider": "dev_bypass",
+          "devPaymentBypass": true
+        },
+        "createdAt": 1787351544326
+      },
+      "expectedAmount": 1400,
+      "currency": "GHS",
+      "customer": {
+        "name": "Franklin Cudjoe",
+        "email": "lcudjoe73@gmail.com",
+        "phone": "+233551704776"
+      },
+      "status": "success",
+      "stockReserved": false,
+      "paidAt": 1787351544326,
+      "devPaymentBypass": true,
+      "reference": "ORD-AWZCEFS",
+      "createdAt": 1787351544328,
+      "updatedAt": 1787351544328
+    },
+    {
+      "provider": "dev_bypass",
+      "orderId": "ORD-CLPNEL6",
+      "orderPayload": {
+        "id": "ORD-CLPNEL6",
+        "orderCode": "ORD-CLPNEL6",
+        "userId": null,
+        "customer": {
+          "name": "Franklin Cudjoe",
+          "email": "lcudjoe73@gmail.com",
+          "phone": "+233551704776"
+        },
+        "email": "lcudjoe73@gmail.com",
+        "phone": "+233551704776",
+        "items": [
+          {
+            "id": "P-93OOP9H",
+            "productId": "P-93OOP9H",
+            "name": "Nmae2",
+            "category": "Dresses",
+            "description": "TEST",
+            "image": "/uploads/1787257522955-d47e70c5-2b5c-401f-9a0d-e6eca66a59d0-img1.jpg",
+            "selectedColor": null,
+            "selectedSize": "XS",
+            "quantity": 2,
+            "qty": 2,
+            "unitPrice": 15,
+            "price": 15,
+            "lineTotal": 30
+          }
+        ],
+        "itemCount": 2,
+        "itemSummary": "Nmae2 x 2",
+        "subtotal": 30,
+        "shipping": 0,
+        "discount": {
+          "subtotalDiscount": 0,
+          "shippingDiscount": 0,
+          "totalDiscount": 0
+        },
+        "promotion": null,
+        "delivery": {
+          "type": "pickup",
+          "cost": 0
+        },
+        "total": 30,
+        "amountPaid": 30,
+        "currency": "GHS",
+        "currentStatus": "Placed",
+        "payment": {
+          "provider": "dev_bypass",
+          "reference": "ORD-CLPNEL6",
+          "status": "success",
+          "amount": 30,
+          "currency": "GHS",
+          "method": "Development payment bypass",
+          "verifiedAt": 1787349216268
+        },
+        "metadata": {
+          "paystackReference": "ORD-CLPNEL6",
+          "paymentProvider": "dev_bypass",
+          "devPaymentBypass": true
+        },
+        "createdAt": 1787349216268
+      },
+      "expectedAmount": 3000,
+      "currency": "GHS",
+      "customer": {
+        "name": "Franklin Cudjoe",
+        "email": "lcudjoe73@gmail.com",
+        "phone": "+233551704776"
+      },
+      "status": "success",
+      "stockReserved": false,
+      "paidAt": 1787349216268,
+      "devPaymentBypass": true,
+      "reference": "ORD-CLPNEL6",
+      "createdAt": 1787349216269,
+      "updatedAt": 1787349227726,
+      "notifications": {
+        "orderCodeSms": {
+          "provider": "arkesel",
+          "messageId": null,
+          "status": "success",
+          "to": "+233551704776",
+          "messagePreview": "Thank you for your purchase. Payment confirmed for GHS 30.00. Your order code is ORD-CLPNEL6. Use Track on the website for delivery updates.",
+          "sentAt": 1787349227726
+        }
+      }
+    },
+    {
+      "provider": "dev_bypass",
+      "orderId": "ORD-UVW9MAH",
+      "orderPayload": {
+        "id": "ORD-UVW9MAH",
+        "orderCode": "ORD-UVW9MAH",
+        "userId": null,
+        "customer": {
+          "name": "Franklin Cudjoe",
+          "email": "lcudjoe73@gmail.com",
+          "phone": "+233551704776"
+        },
+        "email": "lcudjoe73@gmail.com",
+        "phone": "+233551704776",
+        "items": [
+          {
+            "id": "P-THR1OJV",
+            "productId": "P-THR1OJV",
+            "name": "name",
+            "category": "Dresses",
+            "description": "fabric",
+            "image": "/uploads/1787257490819-0f6e39f1-2ccb-4a82-93bd-f0163f4e08dc-img1.jpg",
+            "selectedColor": null,
+            "selectedSize": "XS",
+            "quantity": 1,
+            "qty": 1,
+            "unitPrice": 14,
+            "price": 14,
+            "lineTotal": 14
+          }
+        ],
+        "itemCount": 1,
+        "itemSummary": "name x 1",
+        "subtotal": 14,
+        "shipping": 0,
+        "discount": {
+          "subtotalDiscount": 0,
+          "shippingDiscount": 0,
+          "totalDiscount": 0
+        },
+        "promotion": null,
+        "delivery": {
+          "type": "pickup",
+          "cost": 0
+        },
+        "total": 14,
+        "amountPaid": 14,
+        "currency": "GHS",
+        "currentStatus": "Placed",
+        "payment": {
+          "provider": "dev_bypass",
+          "reference": "ORD-UVW9MAH",
+          "status": "success",
+          "amount": 14,
+          "currency": "GHS",
+          "method": "Development payment bypass",
+          "verifiedAt": 1787347024402
+        },
+        "metadata": {
+          "paystackReference": "ORD-UVW9MAH",
+          "paymentProvider": "dev_bypass",
+          "devPaymentBypass": true
+        },
+        "createdAt": 1787347024402
+      },
+      "expectedAmount": 1400,
+      "currency": "GHS",
+      "customer": {
+        "name": "Franklin Cudjoe",
+        "email": "lcudjoe73@gmail.com",
+        "phone": "+233551704776"
+      },
+      "status": "success",
+      "stockReserved": false,
+      "paidAt": 1787347024402,
+      "devPaymentBypass": true,
+      "reference": "ORD-UVW9MAH",
+      "createdAt": 1787347024403,
+      "updatedAt": 1787347028329,
+      "notifications": {
+        "orderCodeSms": {
+          "provider": "arkesel",
+          "messageId": null,
+          "status": "success",
+          "to": "+233551704776",
+          "messagePreview": "LisaTrendz: Payment confirmed. Your order code is ORD-UVW9MAH. Total GHS 14.00. Use Track on the website for delivery updates.",
+          "sentAt": 1787347028329
+        }
+      }
+    },
+    {
+      "provider": "dev_bypass",
+      "orderId": "ORD-DPVO4ZT",
+      "orderPayload": {
+        "id": "ORD-DPVO4ZT",
+        "orderCode": "ORD-DPVO4ZT",
+        "userId": null,
+        "customer": {
+          "name": "Franklin Cudjoe",
+          "email": "lcudjoe73@gmail.com",
+          "phone": "+233551704776"
+        },
+        "email": "lcudjoe73@gmail.com",
+        "phone": "+233551704776",
+        "items": [
+          {
+            "id": "P-THR1OJV",
+            "productId": "P-THR1OJV",
+            "name": "name",
+            "category": "Dresses",
+            "description": "fabric",
+            "image": "/uploads/1787257490819-0f6e39f1-2ccb-4a82-93bd-f0163f4e08dc-img1.jpg",
+            "selectedColor": null,
+            "selectedSize": "XS",
+            "quantity": 1,
+            "qty": 1,
+            "unitPrice": 14,
+            "price": 14,
+            "lineTotal": 14
+          }
+        ],
+        "itemCount": 1,
+        "itemSummary": "name x 1",
+        "subtotal": 14,
+        "shipping": 0,
+        "discount": {
+          "subtotalDiscount": 0,
+          "shippingDiscount": 0,
+          "totalDiscount": 0
+        },
+        "promotion": null,
+        "delivery": {
+          "type": "pickup",
+          "cost": 0
+        },
+        "total": 14,
+        "amountPaid": 14,
+        "currency": "GHS",
+        "currentStatus": "Placed",
+        "payment": {
+          "provider": "dev_bypass",
+          "reference": "ORD-DPVO4ZT",
+          "status": "success",
+          "amount": 14,
+          "currency": "GHS",
+          "method": "Development payment bypass",
+          "verifiedAt": 1787346349843
+        },
+        "metadata": {
+          "paystackReference": "ORD-DPVO4ZT",
+          "paymentProvider": "dev_bypass",
+          "devPaymentBypass": true
+        },
+        "createdAt": 1787346349843
+      },
+      "expectedAmount": 1400,
+      "currency": "GHS",
+      "customer": {
+        "name": "Franklin Cudjoe",
+        "email": "lcudjoe73@gmail.com",
+        "phone": "+233551704776"
+      },
+      "status": "success",
+      "stockReserved": false,
+      "paidAt": 1787346349843,
+      "devPaymentBypass": true,
+      "reference": "ORD-DPVO4ZT",
+      "createdAt": 1787346349844,
+      "updatedAt": 1787346349855,
+      "notifications": {
+        "orderCodeSms": {
+          "status": "skipped",
+          "reason": "SMS is disabled.",
+          "messagePreview": "LisaTrendz: Payment confirmed. Your order code is ORD-DPVO4ZT. Total GHS 14.00. Use Track on the website for delivery updates.",
+          "lastAttemptAt": 1787346349855
+        }
+      }
+    },
+    {
+      "provider": "dev_bypass",
+      "orderId": "ORD-P7MYRJ8",
+      "orderPayload": {
+        "id": "ORD-P7MYRJ8",
+        "orderCode": "ORD-P7MYRJ8",
+        "userId": null,
+        "customer": {
+          "name": "Franklin Cudjoe",
+          "email": "lcudjoe73@gmail.com",
+          "phone": "+233551704776"
+        },
+        "email": "lcudjoe73@gmail.com",
+        "phone": "+233551704776",
+        "items": [
+          {
+            "id": "P-THR1OJV",
+            "productId": "P-THR1OJV",
+            "name": "name",
+            "category": "Dresses",
+            "description": "fabric",
+            "image": "/uploads/1787257490819-0f6e39f1-2ccb-4a82-93bd-f0163f4e08dc-img1.jpg",
+            "selectedColor": null,
+            "selectedSize": "XS",
+            "quantity": 1,
+            "qty": 1,
+            "unitPrice": 14,
+            "price": 14,
+            "lineTotal": 14
+          }
+        ],
+        "itemCount": 1,
+        "itemSummary": "name x 1",
+        "subtotal": 14,
+        "shipping": 0,
+        "discount": {
+          "subtotalDiscount": 0,
+          "shippingDiscount": 0,
+          "totalDiscount": 0
+        },
+        "promotion": null,
+        "delivery": {
+          "type": "pickup",
+          "cost": 0
+        },
+        "total": 14,
+        "amountPaid": 14,
+        "currency": "GHS",
+        "currentStatus": "Placed",
+        "payment": {
+          "provider": "dev_bypass",
+          "reference": "ORD-P7MYRJ8",
+          "status": "success",
+          "amount": 14,
+          "currency": "GHS",
+          "method": "Development payment bypass",
+          "verifiedAt": 1787346261553
+        },
+        "metadata": {
+          "paystackReference": "ORD-P7MYRJ8",
+          "paymentProvider": "dev_bypass",
+          "devPaymentBypass": true
+        },
+        "createdAt": 1787346261553
+      },
+      "expectedAmount": 1400,
+      "currency": "GHS",
+      "customer": {
+        "name": "Franklin Cudjoe",
+        "email": "lcudjoe73@gmail.com",
+        "phone": "+233551704776"
+      },
+      "status": "success",
+      "stockReserved": false,
+      "paidAt": 1787346261553,
+      "devPaymentBypass": true,
+      "reference": "ORD-P7MYRJ8",
+      "createdAt": 1787346261555,
+      "updatedAt": 1787346261566,
+      "notifications": {
+        "orderCodeSms": {
+          "status": "skipped",
+          "reason": "SMS is disabled.",
+          "messagePreview": "LisaTrendz: Payment confirmed. Your order code is ORD-P7MYRJ8. Total GHS 14.00. Use Track on the website for delivery updates.",
+          "lastAttemptAt": 1787346261566
+        }
+      }
+    },
+    {
+      "provider": "dev_bypass",
+      "orderId": "ORD-9IPNZ9U",
+      "orderPayload": {
+        "id": "ORD-9IPNZ9U",
+        "orderCode": "ORD-9IPNZ9U",
+        "userId": null,
+        "customer": {
+          "name": "Franklin Cudjoe",
+          "email": "lcudjoe73@gmail.com",
+          "phone": "+233551704776"
+        },
+        "email": "lcudjoe73@gmail.com",
+        "phone": "+233551704776",
+        "items": [
+          {
+            "id": "P-93OOP9H",
+            "productId": "P-93OOP9H",
+            "name": "Nmae2",
+            "category": "Dresses",
+            "description": "TEST",
+            "image": "/uploads/1787257522955-d47e70c5-2b5c-401f-9a0d-e6eca66a59d0-img1.jpg",
+            "selectedColor": null,
+            "selectedSize": "XS",
+            "quantity": 1,
+            "qty": 1,
+            "unitPrice": 15,
+            "price": 15,
+            "lineTotal": 15
+          }
+        ],
+        "itemCount": 1,
+        "itemSummary": "Nmae2 x 1",
+        "subtotal": 15,
+        "shipping": 0,
+        "discount": {
+          "subtotalDiscount": 0,
+          "shippingDiscount": 0,
+          "totalDiscount": 0
+        },
+        "promotion": null,
+        "delivery": {
+          "type": "pickup",
+          "cost": 0
+        },
+        "total": 15,
+        "amountPaid": 15,
+        "currency": "GHS",
+        "currentStatus": "Placed",
+        "payment": {
+          "provider": "dev_bypass",
+          "reference": "ORD-9IPNZ9U",
+          "status": "success",
+          "amount": 15,
+          "currency": "GHS",
+          "method": "Development payment bypass",
+          "verifiedAt": 1787346220536
+        },
+        "metadata": {
+          "paystackReference": "ORD-9IPNZ9U",
+          "paymentProvider": "dev_bypass",
+          "devPaymentBypass": true
+        },
+        "createdAt": 1787346220536
+      },
+      "expectedAmount": 1500,
+      "currency": "GHS",
+      "customer": {
+        "name": "Franklin Cudjoe",
+        "email": "lcudjoe73@gmail.com",
+        "phone": "+233551704776"
+      },
+      "status": "success",
+      "stockReserved": false,
+      "paidAt": 1787346220536,
+      "devPaymentBypass": true,
+      "reference": "ORD-9IPNZ9U",
+      "createdAt": 1787346220536,
+      "updatedAt": 1787346220543,
+      "notifications": {
+        "orderCodeSms": {
+          "status": "skipped",
+          "reason": "SMS is disabled.",
+          "messagePreview": "LisaTrendz: Payment confirmed. Your order code is ORD-9IPNZ9U. Total GHS 15.00. Use Track on the website for delivery updates.",
+          "lastAttemptAt": 1787346220543
+        }
+      }
+    },
+    {
+      "provider": "dev_bypass",
+      "orderId": "ORD-OF4J19M",
+      "orderPayload": {
+        "id": "ORD-OF4J19M",
+        "orderCode": "ORD-OF4J19M",
+        "userId": null,
+        "customer": {
+          "name": "Franklin Cudjoe",
+          "email": "lcudjoe73@gmail.com",
+          "phone": "+233551704776"
+        },
+        "email": "lcudjoe73@gmail.com",
+        "phone": "+233551704776",
+        "items": [
+          {
+            "id": "P-93OOP9H",
+            "productId": "P-93OOP9H",
+            "name": "Nmae2",
+            "category": "Dresses",
+            "description": "TEST",
+            "image": "/uploads/1787257522955-d47e70c5-2b5c-401f-9a0d-e6eca66a59d0-img1.jpg",
+            "selectedColor": null,
+            "selectedSize": "XS",
+            "quantity": 1,
+            "qty": 1,
+            "unitPrice": 15,
+            "price": 15,
+            "lineTotal": 15
+          }
+        ],
+        "itemCount": 1,
+        "itemSummary": "Nmae2 x 1",
+        "subtotal": 15,
+        "shipping": 0,
+        "discount": {
+          "subtotalDiscount": 0,
+          "shippingDiscount": 0,
+          "totalDiscount": 0
+        },
+        "promotion": null,
+        "delivery": {
+          "type": "pickup",
+          "cost": 0
+        },
+        "total": 15,
+        "amountPaid": 15,
+        "currency": "GHS",
+        "currentStatus": "Placed",
+        "payment": {
+          "provider": "dev_bypass",
+          "reference": "ORD-OF4J19M",
+          "status": "success",
+          "amount": 15,
+          "currency": "GHS",
+          "method": "Development payment bypass",
+          "verifiedAt": 1787346219633
+        },
+        "metadata": {
+          "paystackReference": "ORD-OF4J19M",
+          "paymentProvider": "dev_bypass",
+          "devPaymentBypass": true
+        },
+        "createdAt": 1787346219633
+      },
+      "expectedAmount": 1500,
+      "currency": "GHS",
+      "customer": {
+        "name": "Franklin Cudjoe",
+        "email": "lcudjoe73@gmail.com",
+        "phone": "+233551704776"
+      },
+      "status": "success",
+      "stockReserved": false,
+      "paidAt": 1787346219633,
+      "devPaymentBypass": true,
+      "reference": "ORD-OF4J19M",
+      "createdAt": 1787346219633,
+      "updatedAt": 1787346219641,
+      "notifications": {
+        "orderCodeSms": {
+          "status": "skipped",
+          "reason": "SMS is disabled.",
+          "messagePreview": "LisaTrendz: Payment confirmed. Your order code is ORD-OF4J19M. Total GHS 15.00. Use Track on the website for delivery updates.",
+          "lastAttemptAt": 1787346219641
+        }
+      }
+    },
+    {
+      "provider": "dev_bypass",
+      "orderId": "ORD-25SJUR1",
+      "orderPayload": {
+        "id": "ORD-25SJUR1",
+        "orderCode": "ORD-25SJUR1",
+        "userId": null,
+        "customer": {
+          "name": "Franklin Cudjoe",
+          "email": "lcudjoe73@gmail.com",
+          "phone": "+233551704776"
+        },
+        "email": "lcudjoe73@gmail.com",
+        "phone": "+233551704776",
+        "items": [
+          {
+            "id": "P-93OOP9H",
+            "productId": "P-93OOP9H",
+            "name": "Nmae2",
+            "category": "Dresses",
+            "description": "TEST",
+            "image": "/uploads/1787257522955-d47e70c5-2b5c-401f-9a0d-e6eca66a59d0-img1.jpg",
+            "selectedColor": null,
+            "selectedSize": "XS",
+            "quantity": 1,
+            "qty": 1,
+            "unitPrice": 15,
+            "price": 15,
+            "lineTotal": 15
+          }
+        ],
+        "itemCount": 1,
+        "itemSummary": "Nmae2 x 1",
+        "subtotal": 15,
+        "shipping": 0,
+        "discount": {
+          "subtotalDiscount": 0,
+          "shippingDiscount": 0,
+          "totalDiscount": 0
+        },
+        "promotion": null,
+        "delivery": {
+          "type": "pickup",
+          "cost": 0
+        },
+        "total": 15,
+        "amountPaid": 15,
+        "currency": "GHS",
+        "currentStatus": "Placed",
+        "payment": {
+          "provider": "dev_bypass",
+          "reference": "ORD-25SJUR1",
+          "status": "success",
+          "amount": 15,
+          "currency": "GHS",
+          "method": "Development payment bypass",
+          "verifiedAt": 1787346197261
+        },
+        "metadata": {
+          "paystackReference": "ORD-25SJUR1",
+          "paymentProvider": "dev_bypass",
+          "devPaymentBypass": true
+        },
+        "createdAt": 1787346197261
+      },
+      "expectedAmount": 1500,
+      "currency": "GHS",
+      "customer": {
+        "name": "Franklin Cudjoe",
+        "email": "lcudjoe73@gmail.com",
+        "phone": "+233551704776"
+      },
+      "status": "success",
+      "stockReserved": false,
+      "paidAt": 1787346197261,
+      "devPaymentBypass": true,
+      "reference": "ORD-25SJUR1",
+      "createdAt": 1787346197262,
+      "updatedAt": 1787346197270,
+      "notifications": {
+        "orderCodeSms": {
+          "status": "skipped",
+          "reason": "SMS is disabled.",
+          "messagePreview": "LisaTrendz: Payment confirmed. Your order code is ORD-25SJUR1. Total GHS 15.00. Use Track on the website for delivery updates.",
+          "lastAttemptAt": 1787346197270
+        }
+      }
+    },
+    {
+      "provider": "dev_bypass",
+      "orderId": "ORD-E2YL0O1",
+      "orderPayload": {
+        "id": "ORD-E2YL0O1",
+        "orderCode": "ORD-E2YL0O1",
+        "userId": null,
+        "customer": {
+          "name": "Franklin Cudjoe",
+          "email": "lcudjoe73@gmail.com",
+          "phone": "+233551704776"
+        },
+        "email": "lcudjoe73@gmail.com",
+        "phone": "+233551704776",
+        "items": [
+          {
+            "id": "P-THR1OJV",
+            "productId": "P-THR1OJV",
+            "name": "name",
+            "category": "Dresses",
+            "description": "fabric",
+            "image": "/uploads/1787257490819-0f6e39f1-2ccb-4a82-93bd-f0163f4e08dc-img1.jpg",
+            "selectedColor": null,
+            "selectedSize": "XS",
+            "quantity": 1,
+            "qty": 1,
+            "unitPrice": 14,
+            "price": 14,
+            "lineTotal": 14
+          }
+        ],
+        "itemCount": 1,
+        "itemSummary": "name x 1",
+        "subtotal": 14,
+        "shipping": 0,
+        "discount": {
+          "subtotalDiscount": 0,
+          "shippingDiscount": 0,
+          "totalDiscount": 0
+        },
+        "promotion": null,
+        "delivery": {
+          "type": "pickup",
+          "cost": 0
+        },
+        "total": 14,
+        "amountPaid": 14,
+        "currency": "GHS",
+        "currentStatus": "Placed",
+        "payment": {
+          "provider": "dev_bypass",
+          "reference": "ORD-E2YL0O1",
+          "status": "success",
+          "amount": 14,
+          "currency": "GHS",
+          "method": "Development payment bypass",
+          "verifiedAt": 1787345430536
+        },
+        "metadata": {
+          "paystackReference": "ORD-E2YL0O1",
+          "paymentProvider": "dev_bypass",
+          "devPaymentBypass": true
+        },
+        "createdAt": 1787345430536
+      },
+      "expectedAmount": 1400,
+      "currency": "GHS",
+      "customer": {
+        "name": "Franklin Cudjoe",
+        "email": "lcudjoe73@gmail.com",
+        "phone": "+233551704776"
+      },
+      "status": "success",
+      "stockReserved": false,
+      "paidAt": 1787345430536,
+      "devPaymentBypass": true,
+      "reference": "ORD-E2YL0O1",
+      "createdAt": 1787345430537,
+      "updatedAt": 1787345430549,
+      "notifications": {
+        "orderCodeSms": {
+          "status": "skipped",
+          "reason": "SMS is disabled.",
+          "messagePreview": "LisaTrendz: Payment confirmed. Your order code is ORD-E2YL0O1. Total GHS 14.00. Use Track on the website for delivery updates.",
+          "lastAttemptAt": 1787345430549
+        }
+      }
+    },
+    {
+      "provider": "dev_bypass",
+      "orderId": "ORD-1WRDQYB",
+      "orderPayload": {
+        "id": "ORD-1WRDQYB",
+        "orderCode": "ORD-1WRDQYB",
+        "userId": null,
+        "customer": {
+          "name": "Franklin Cudjoe",
+          "email": "lcudjoe73@gmail.com",
+          "phone": "+233551704776"
+        },
+        "email": "lcudjoe73@gmail.com",
+        "phone": "+233551704776",
+        "items": [
+          {
+            "id": "P-THR1OJV",
+            "productId": "P-THR1OJV",
+            "name": "name",
+            "category": "Dresses",
+            "description": "fabric",
+            "image": "/uploads/1787257490819-0f6e39f1-2ccb-4a82-93bd-f0163f4e08dc-img1.jpg",
+            "selectedColor": null,
+            "selectedSize": "XS",
+            "quantity": 1,
+            "qty": 1,
+            "unitPrice": 14,
+            "price": 14,
+            "lineTotal": 14
+          }
+        ],
+        "itemCount": 1,
+        "itemSummary": "name x 1",
+        "subtotal": 14,
+        "shipping": 0,
+        "discount": {
+          "subtotalDiscount": 0,
+          "shippingDiscount": 0,
+          "totalDiscount": 0
+        },
+        "promotion": null,
+        "delivery": {
+          "type": "pickup",
+          "cost": 0
+        },
+        "total": 14,
+        "amountPaid": 14,
+        "currency": "GHS",
+        "currentStatus": "Placed",
+        "payment": {
+          "provider": "dev_bypass",
+          "reference": "ORD-1WRDQYB",
+          "status": "success",
+          "amount": 14,
+          "currency": "GHS",
+          "method": "Development payment bypass",
+          "verifiedAt": 1787344697377
+        },
+        "metadata": {
+          "paystackReference": "ORD-1WRDQYB",
+          "paymentProvider": "dev_bypass",
+          "devPaymentBypass": true
+        },
+        "createdAt": 1787344697377
+      },
+      "expectedAmount": 1400,
+      "currency": "GHS",
+      "customer": {
+        "name": "Franklin Cudjoe",
+        "email": "lcudjoe73@gmail.com",
+        "phone": "+233551704776"
+      },
+      "status": "success",
+      "stockReserved": false,
+      "paidAt": 1787344697377,
+      "devPaymentBypass": true,
+      "reference": "ORD-1WRDQYB",
+      "createdAt": 1787344697378,
+      "updatedAt": 1787344697387,
+      "notifications": {
+        "orderCodeSms": {
+          "status": "skipped",
+          "reason": "SMS is disabled.",
+          "messagePreview": "LisaTrendz: Payment confirmed. Your order code is ORD-1WRDQYB. Total GHS 14.00. Use Track on the website for delivery updates.",
+          "lastAttemptAt": 1787344697387
+        }
+      }
+    },
+    {
+      "provider": "dev_bypass",
+      "orderId": "ORD-VXMR0LX",
+      "orderPayload": {
+        "id": "ORD-VXMR0LX",
+        "orderCode": "ORD-VXMR0LX",
+        "userId": null,
+        "customer": {
+          "name": "Franklin Cudjoe",
+          "email": "lcudjoe73@gmail.com",
+          "phone": "+233551704776"
+        },
+        "email": "lcudjoe73@gmail.com",
+        "phone": "+233551704776",
+        "items": [
+          {
+            "id": "P-93OOP9H",
+            "productId": "P-93OOP9H",
+            "name": "Nmae2",
+            "category": "Dresses",
+            "description": "TEST",
+            "image": "/uploads/1787257522955-d47e70c5-2b5c-401f-9a0d-e6eca66a59d0-img1.jpg",
+            "selectedColor": null,
+            "selectedSize": "XS",
+            "quantity": 1,
+            "qty": 1,
+            "unitPrice": 15,
+            "price": 15,
+            "lineTotal": 15
+          },
+          {
+            "id": "P-THR1OJV",
+            "productId": "P-THR1OJV",
+            "name": "name",
+            "category": "Dresses",
+            "description": "fabric",
+            "image": "/uploads/1787257490819-0f6e39f1-2ccb-4a82-93bd-f0163f4e08dc-img1.jpg",
+            "selectedColor": null,
+            "selectedSize": "XS",
+            "quantity": 1,
+            "qty": 1,
+            "unitPrice": 14,
+            "price": 14,
+            "lineTotal": 14
+          }
+        ],
+        "itemCount": 2,
+        "itemSummary": "Nmae2 x 1, name x 1",
+        "subtotal": 29,
+        "shipping": 0,
+        "discount": {
+          "subtotalDiscount": 0,
+          "shippingDiscount": 0,
+          "totalDiscount": 0
+        },
+        "promotion": null,
+        "delivery": {
+          "type": "pickup",
+          "cost": 0
+        },
+        "total": 29,
+        "amountPaid": 29,
+        "currency": "GHS",
+        "currentStatus": "Placed",
+        "payment": {
+          "provider": "dev_bypass",
+          "reference": "ORD-VXMR0LX",
+          "status": "success",
+          "amount": 29,
+          "currency": "GHS",
+          "method": "Development payment bypass",
+          "verifiedAt": 1787333831201
+        },
+        "metadata": {
+          "paystackReference": "ORD-VXMR0LX",
+          "paymentProvider": "dev_bypass",
+          "devPaymentBypass": true
+        },
+        "createdAt": 1787333831200
+      },
+      "expectedAmount": 2900,
+      "currency": "GHS",
+      "customer": {
+        "name": "Franklin Cudjoe",
+        "email": "lcudjoe73@gmail.com",
+        "phone": "+233551704776"
+      },
+      "status": "success",
+      "stockReserved": false,
+      "paidAt": 1787333831201,
+      "devPaymentBypass": true,
+      "reference": "ORD-VXMR0LX",
+      "createdAt": 1787333831204,
+      "updatedAt": 1787333831220,
+      "notifications": {
+        "orderCodeSms": {
+          "status": "skipped",
+          "reason": "SMS is disabled.",
+          "lastAttemptAt": 1787333831220
+        }
+      }
+    },
+    {
+      "provider": "dev_bypass",
+      "orderId": "ORD-2MBVV8Z",
+      "orderPayload": {
+        "id": "ORD-2MBVV8Z",
+        "orderCode": "ORD-2MBVV8Z",
+        "userId": null,
+        "customer": {
+          "name": "Franklin Cudjoe",
+          "email": "lcudjoe73@gmail.com",
+          "phone": "+233551704776"
+        },
+        "email": "lcudjoe73@gmail.com",
+        "phone": "+233551704776",
+        "items": [
+          {
+            "id": "P-93OOP9H",
+            "productId": "P-93OOP9H",
+            "name": "Nmae2",
+            "category": "Dresses",
+            "description": "TEST",
+            "image": "/uploads/1787257522955-d47e70c5-2b5c-401f-9a0d-e6eca66a59d0-img1.jpg",
+            "selectedColor": null,
+            "selectedSize": "XS",
+            "quantity": 1,
+            "qty": 1,
+            "unitPrice": 15,
+            "price": 15,
+            "lineTotal": 15
+          }
+        ],
+        "itemCount": 1,
+        "itemSummary": "Nmae2 x 1",
+        "subtotal": 15,
+        "shipping": 0,
+        "discount": {
+          "subtotalDiscount": 0,
+          "shippingDiscount": 0,
+          "totalDiscount": 0
+        },
+        "promotion": null,
+        "delivery": {
+          "type": "pickup",
+          "cost": 0
+        },
+        "total": 15,
+        "amountPaid": 15,
+        "currency": "GHS",
+        "currentStatus": "Placed",
+        "payment": {
+          "provider": "dev_bypass",
+          "reference": "ORD-2MBVV8Z",
+          "status": "success",
+          "amount": 15,
+          "currency": "GHS",
+          "method": "Development payment bypass",
+          "verifiedAt": 1787333668716
+        },
+        "metadata": {
+          "paystackReference": "ORD-2MBVV8Z",
+          "paymentProvider": "dev_bypass",
+          "devPaymentBypass": true
+        },
+        "createdAt": 1787333668716
+      },
+      "expectedAmount": 1500,
+      "currency": "GHS",
+      "customer": {
+        "name": "Franklin Cudjoe",
+        "email": "lcudjoe73@gmail.com",
+        "phone": "+233551704776"
+      },
+      "status": "success",
+      "stockReserved": false,
+      "paidAt": 1787333668716,
+      "devPaymentBypass": true,
+      "reference": "ORD-2MBVV8Z",
+      "createdAt": 1787333668719,
+      "updatedAt": 1787333668739,
+      "notifications": {
+        "orderCodeSms": {
+          "status": "skipped",
+          "reason": "SMS is disabled.",
+          "lastAttemptAt": 1787333668739
+        }
+      }
+    }
+  ]
 }

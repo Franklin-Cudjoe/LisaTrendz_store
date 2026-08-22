@@ -295,7 +295,7 @@ export default function Home({
         )}
       </div>
       {recentlyViewedProducts.length > 0 && (
-        <div className="container">
+        <div className="container" id="recently-viewed">
           <ProductShelf
             kicker="Recently Viewed"
             title="Pick up where you left off"

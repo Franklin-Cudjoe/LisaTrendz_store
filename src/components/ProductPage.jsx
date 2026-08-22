@@ -267,8 +267,11 @@ export default function ProductPage({
           </div>
           {productColors.length > 0 && (
             <div className="product-color-section">
-              <div className="product-color-heading">Available colours</div>
-              <div className="product-color-options">
+              <div className="product-size-heading product-color-heading">
+                <span>Choose colour</span>
+                <strong>{selectedColor?.name || "Select"}</strong>
+              </div>
+              <div className="product-color-options" aria-label="Choose colour">
                 {productColors.map((color, index) => {
                   const active =
                     selectedColor &&

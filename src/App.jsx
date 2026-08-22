@@ -18,6 +18,7 @@ import { getProductStock, normalizeProductStock } from "./utils/productStock.js"
 import { calculateOrderTotals, formatMoney } from "./utils/promotions.js";
 import {
   fetchProducts,
+  initializeDevPaymentBypass,
   initializePaystackPayment,
   verifyPaystackPayment,
 } from "./services/storeApi.js";
@@ -25,6 +26,8 @@ import {
 const SAVED_PRODUCTS_KEY = "savedProductIds";
 const PRODUCT_REVIEWS_KEY = "productReviews";
 const RECENTLY_VIEWED_KEY = "recentlyViewedProductIds";
+const CAN_USE_DEV_PAYMENT_BYPASS =
+  import.meta.env.VITE_DEV_PAYMENT_BYPASS === "true";
 
 function normalizeProduct(product) {
   return normalizeProductStock(
@@ -141,6 +144,15 @@ function buildOrderItem(item) {
   };
 }
 
+function formatOrderItemSummary(item) {
+  const quantity = Number(item.quantity || item.qty || 1);
+  const variant = [item.selectedSize, item.selectedColor?.name]
+    .filter(Boolean)
+    .join("/");
+
+  return `${item.name || "Item"}${variant ? ` (${variant})` : ""} x ${quantity}`;
+}
+
 export default function App() {
   const [view, setView] = useState("home");
   const [trackerReturnView, setTrackerReturnView] = useState("home");
@@ -152,6 +164,8 @@ export default function App() {
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [orderConfirm, setOrderConfirm] = useState(null); // { id, total }
   const [paymentNotice, setPaymentNotice] = useState(null);
+  const [paymentReturnTransition, setPaymentReturnTransition] = useState(false);
+  const [paymentLandingTarget, setPaymentLandingTarget] = useState("");
   const [lastOrderId, setLastOrderId] = useState(null);
   const [category, setCategory] = useState(CATEGORY_ALL);
   const [productList, setProductList] = useState(
@@ -233,6 +247,25 @@ export default function App() {
 
       if (!isPaystackReturn) return;
 
+      const transitionStartedAt = Date.now();
+      const finishReturnTransition = () => {
+        const remaining = Math.max(0, 950 - (Date.now() - transitionStartedAt));
+
+        window.setTimeout(() => {
+          if (!cancelled) setPaymentReturnTransition(false);
+        }, remaining);
+      };
+
+      setPaymentReturnTransition(true);
+      setView("home");
+      setTrackerReturnView("home");
+      setSelected(null);
+      setCartOpen(false);
+      setCheckoutOpen(false);
+      setPaymentNotice(null);
+      setOrderConfirm(null);
+      setPaymentLandingTarget("recently-viewed");
+
       const storedReference = (() => {
         try {
           return localStorage.getItem("pendingPaystackReference") || "";
@@ -261,6 +294,7 @@ export default function App() {
             message: "Paystack did not return a payment reference.",
           });
         }
+        finishReturnTransition();
         return;
       }
 
@@ -280,13 +314,20 @@ export default function App() {
         }
 
         if (result.paid && result.status === "success" && order) {
+          const smsNotification =
+            result.notification || order.notifications?.orderCodeSms || {};
+
           setCart([]);
           setPromotion(null);
           setCheckoutOpen(false);
           setOrderConfirm({
             id: orderId,
             total: Number(order.total || order.amountPaid || 0),
+            smsSent: Boolean(smsNotification.sentAt),
+            smsStatus: smsNotification.status || "",
+            smsReason: smsNotification.reason || "",
           });
+          finishReturnTransition();
           return;
         }
 
@@ -305,6 +346,7 @@ export default function App() {
                 : "Your payment has not been confirmed yet. Mobile money payments can sometimes take a short moment to settle.",
           orderId,
         });
+        finishReturnTransition();
       } catch (e) {
         if (!cancelled) {
           setPaymentNotice({
@@ -314,6 +356,7 @@ export default function App() {
               "Please use your Paystack reference or order code to check again.",
           });
         }
+        finishReturnTransition();
       }
     }
 
@@ -360,6 +403,49 @@ export default function App() {
       .map((id) => productsById.get(id))
       .filter(Boolean);
   }, [productList, recentlyViewedIds]);
+
+  useEffect(() => {
+    if (paymentLandingTarget !== "recently-viewed" || view !== "home") return;
+    if (typeof window === "undefined") return;
+
+    let attempts = 0;
+    let timeoutId = 0;
+
+    function scrollToRecentlyViewed() {
+      const target = document.getElementById("recently-viewed");
+      const fallback = document.getElementById("collections");
+
+      if (target || attempts >= 8) {
+        const element = target || fallback;
+
+        if (element) {
+          element.scrollIntoView({ behavior: "smooth", block: "start" });
+        } else {
+          try {
+            window.scrollTo({ top: 0, behavior: "smooth" });
+          } catch (e) {}
+        }
+
+        setPaymentLandingTarget("");
+        return;
+      }
+
+      attempts += 1;
+      timeoutId = window.setTimeout(scrollToRecentlyViewed, 120);
+    }
+
+    timeoutId = window.setTimeout(
+      scrollToRecentlyViewed,
+      paymentReturnTransition ? 520 : 120,
+    );
+
+    return () => window.clearTimeout(timeoutId);
+  }, [
+    paymentLandingTarget,
+    paymentReturnTransition,
+    recentlyViewedProducts.length,
+    view,
+  ]);
 
   useEffect(() => {
     try {
@@ -498,18 +584,63 @@ export default function App() {
       const cartKey = getCartItemKey(product);
       const existing = prev.find((i) => (i.cartKey || i.id) === cartKey);
       const stock = getProductStock(product);
-      const nextQty = (existing?.qty || 0) + qty;
+      const cleanQty = Math.max(1, Math.floor(Number(qty) || 1));
 
-      if (stock != null && nextQty > stock) {
+      if (existing) {
         return prev;
       }
 
-      if (existing) {
-        return prev.map((i) =>
-          (i.cartKey || i.id) === cartKey ? { ...i, qty: i.qty + qty } : i,
-        );
+      if (stock != null && cleanQty > stock) {
+        return prev;
       }
-      return [...prev, { ...product, cartKey, qty }];
+
+      return [...prev, { ...product, cartKey, qty: cleanQty }];
+    });
+  }
+
+  function updateCartQuantity(cartKey, qty) {
+    const cleanQty = Math.max(1, Math.floor(Number(qty) || 1));
+
+    setCart((prev) =>
+      prev.map((item) => {
+        const itemKey = item.cartKey || item.id;
+
+        if (itemKey !== cartKey) return item;
+
+        const stock = getProductStock(item);
+        const stockLimit = stock == null ? null : Math.max(1, stock);
+        const nextQty = stockLimit ? Math.min(cleanQty, stockLimit) : cleanQty;
+
+        return { ...item, qty: nextQty };
+      }),
+    );
+  }
+
+  function updateCartVariant(cartKey, patch = {}) {
+    setCart((prev) => {
+      const current = prev.find((item) => (item.cartKey || item.id) === cartKey);
+
+      if (!current) return prev;
+
+      const updated = {
+        ...current,
+        ...patch,
+      };
+      const nextKey = getCartItemKey(updated);
+      const alreadyExists = prev.some(
+        (item) => (item.cartKey || item.id) !== cartKey &&
+          (item.cartKey || item.id) === nextKey,
+      );
+
+      if (alreadyExists) {
+        return prev.filter((item) => (item.cartKey || item.id) !== cartKey);
+      }
+
+      return prev.map((item) =>
+        (item.cartKey || item.id) === cartKey
+          ? { ...updated, cartKey: nextKey }
+          : item,
+      );
     });
   }
 
@@ -529,7 +660,31 @@ export default function App() {
     setCheckoutOpen(true);
   }
 
-  async function completePayment(customer = {}) {
+  function rememberCartProductsAsRecentlyViewed() {
+    const productIds = [
+      ...new Set(
+        cart
+          .map((item) => item.productId || item.id)
+          .filter((id) => typeof id === "string" && id.trim()),
+      ),
+    ];
+
+    if (!productIds.length) return;
+
+    const storedIds = readStoredIdList(RECENTLY_VIEWED_KEY);
+    const next = [
+      ...productIds,
+      ...storedIds.filter((id) => !productIds.includes(id)),
+    ].slice(0, 8);
+
+    setRecentlyViewedIds(next);
+
+    try {
+      localStorage.setItem(RECENTLY_VIEWED_KEY, JSON.stringify(next));
+    } catch (e) {}
+  }
+
+  function buildCheckoutOrderPayload(customer = {}) {
     const id = "ORD-" + Math.random().toString(36).slice(2, 9).toUpperCase();
 
     const totals = calculateOrderTotals(cart, checkoutDelivery, promotion);
@@ -550,7 +705,7 @@ export default function App() {
       amountPaid: 0,
       itemCount: orderItems.reduce((total, item) => total + item.quantity, 0),
       itemSummary: orderItems
-        .map((item) => `${item.name} x ${item.quantity}`)
+        .map(formatOrderItemSummary)
         .join(", "),
       currentStatus: "Payment Pending",
       delivery: checkoutDelivery || { type: "pickup", cost: 0 },
@@ -566,11 +721,18 @@ export default function App() {
       createdAt: Date.now(),
     };
 
+    return { id, orderPayload };
+  }
+
+  async function completePayment(customer = {}) {
+    const { id, orderPayload } = buildCheckoutOrderPayload(customer);
     const payment = await initializePaystackPayment(orderPayload, customer);
 
     if (!payment?.authorizationUrl) {
       throw new Error("Paystack did not return a checkout link.");
     }
+
+    rememberCartProductsAsRecentlyViewed();
 
     try {
       localStorage.setItem("pendingPaystackReference", payment.reference || id);
@@ -580,8 +742,39 @@ export default function App() {
 
   }
 
+  async function completeDevPaymentBypass(customer = {}) {
+    const { id, orderPayload } = buildCheckoutOrderPayload(customer);
+    const result = await initializeDevPaymentBypass(orderPayload, customer);
+    const notification = result.notification || {};
+
+    if (!notification.sentAt) {
+      throw new Error(
+        notification.reason
+          ? `SMS was not sent: ${notification.reason}`
+          : "SMS was not sent. Check your SMS settings.",
+      );
+    }
+
+    const order = result.order || {};
+    const orderId = order.id || order.orderCode || id;
+
+    setCart([]);
+    setPromotion(null);
+    setCheckoutOpen(false);
+    setLastOrderId(orderId);
+    setOrderConfirm({
+      id: orderId,
+      total: Number(order.total || order.amountPaid || orderPayload.total || 0),
+      testMode: true,
+    });
+
+    try {
+      window.__lastOrderId = orderId;
+    } catch (e) {}
+  }
+
   return (
-    <div className="app-root">
+    <div className={`app-root${paymentReturnTransition ? " app-root-returning" : ""}`}>
       <Header
         cartCount={cart.reduce((s, i) => s + i.qty, 0)}
         savedCount={savedProducts.length}
@@ -591,6 +784,24 @@ export default function App() {
         onAdmin={() => setView("admin-login")}
         onTrack={openTracker}
       />
+      {paymentReturnTransition && (
+        <div
+          className="payment-return-overlay"
+          aria-live="polite"
+          aria-label="Returning to LisaTrendz home"
+        >
+          <div className="payment-return-window">
+            <div className="payment-return-controls" aria-hidden="true">
+              <span />
+              <span />
+              <span />
+            </div>
+            <strong>LisaTrendz</strong>
+            <p>Returning home</p>
+            <div className="payment-return-progress" aria-hidden="true" />
+          </div>
+        </div>
+      )}
 
       <main className="container full-width">
         {view === "home" && (
@@ -639,6 +850,8 @@ export default function App() {
             drawer
             items={cart}
             onRemove={removeFromCart}
+            onQuantityChange={updateCartQuantity}
+            onVariantChange={updateCartVariant}
             onBack={() => setCartOpen(false)}
             onCheckout={(delivery) => startCheckout(delivery)}
             onClose={() => setCartOpen(false)}
@@ -656,6 +869,7 @@ export default function App() {
               setCartOpen(true);
             }}
             onPay={completePayment}
+            onDevPay={CAN_USE_DEV_PAYMENT_BYPASS ? completeDevPaymentBypass : null}
           />
         )}
 
@@ -679,12 +893,20 @@ export default function App() {
                 onPay={async (customer) => {
                   await completePayment(customer);
                 }}
+                onDevPay={
+                  CAN_USE_DEV_PAYMENT_BYPASS
+                    ? async (customer) => {
+                        await completeDevPaymentBypass(customer);
+                      }
+                    : null
+                }
               />
             </div>
           </div>
         )}
         {orderConfirm && (
           <div
+            className="payment-dialog-overlay"
             style={{
               position: "fixed",
               inset: 0,
@@ -697,6 +919,7 @@ export default function App() {
             }}
           >
             <div
+              className="payment-dialog"
               style={{
                 background: "#fff",
                 borderRadius: 16,
@@ -708,11 +931,27 @@ export default function App() {
               }}
             >
               <div style={{ fontSize: 40, marginBottom: 8, fontWeight: 900 }}>OK</div>
-              <h2 style={{ margin: "0 0 6px" }}>Order Placed!</h2>
+              <h2 style={{ margin: "0 0 6px" }}>
+                {orderConfirm.testMode ? "Test SMS Sent!" : "Order Placed!"}
+              </h2>
               <p style={{ color: "var(--muted)", margin: "0 0 20px" }}>
-                Your payment of{" "}
-                <strong>{formatMoney(orderConfirm.total)}</strong> was
-                successful. Save your order code to track your delivery.
+                {orderConfirm.testMode ? (
+                  <>
+                    A test order code was sent by SMS. Use this code to test the
+                    Track page.
+                  </>
+                ) : (
+                  <>
+                    Your payment of{" "}
+                    <strong>{formatMoney(orderConfirm.total)}</strong> was
+                    successful.{" "}
+                    {orderConfirm.smsSent
+                      ? "Your order code has been sent by SMS."
+                      : orderConfirm.smsStatus === "failed"
+                        ? "Your order was placed, but the SMS could not be sent."
+                        : "Save your order code to track your delivery."}
+                  </>
+                )}
               </p>
               <div
                 style={{
@@ -777,6 +1016,7 @@ export default function App() {
         )}
         {paymentNotice && (
           <div
+            className="payment-dialog-overlay payment-dialog-notice"
             style={{
               position: "fixed",
               inset: 0,
@@ -789,6 +1029,7 @@ export default function App() {
             }}
           >
             <div
+              className="payment-dialog"
               style={{
                 background: "#fff",
                 borderRadius: 16,

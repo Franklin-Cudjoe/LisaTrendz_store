@@ -1,3 +1,7 @@
 node_modules/
 dist/
 .env
+.codex-devserver.*.log
+.startup-test-*.log
+*.bak
+server/server/

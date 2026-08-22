@@ -353,6 +353,16 @@ export async function initializePaystackPayment(order, customer) {
   return response.json();
 }
 
+export async function initializeDevPaymentBypass(order, customer) {
+  const response = await apiRequest("/api/dev/paystack-bypass", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ order, customer }),
+  });
+
+  return response.json();
+}
+
 export async function verifyPaystackPayment(reference) {
   const response = await apiRequest(
     `/api/paystack/verify/${encodeURIComponent(reference)}`,

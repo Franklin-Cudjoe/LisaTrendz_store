@@ -4,8 +4,27 @@
 .cart-item .meta{min-width:0}
 .cart-item h3{margin:0 0 6px;font-family:Georgia,serif}
 .cart-item p{margin:4px 0;color:var(--muted)}
-.cart-color{display:flex;align-items:center;gap:7px}
-.cart-color span{width:16px;height:16px;border-radius:50%;border:1px solid rgba(32,35,42,.16);box-shadow:0 0 0 2px rgba(255,255,255,.56)}
+.cart-quantity-row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:8px 0 6px;max-width:220px}
+.cart-quantity-row > span{font-size:.78rem;font-weight:900;color:var(--muted);text-transform:uppercase}
+.cart-quantity-control{display:grid;grid-template-columns:34px 48px 34px;align-items:center;border:1px solid var(--line-light);border-radius:8px;overflow:hidden;background:rgba(255,255,255,.66)}
+.cart-quantity-control button{width:34px;height:34px;border:0;background:rgba(241,240,234,.72);color:var(--ink);font:inherit;font-weight:900;cursor:pointer}
+.cart-quantity-control button:disabled{opacity:.42;cursor:not-allowed}
+.cart-quantity-control input{width:48px;height:34px;border:0;border-left:1px solid var(--line-light);border-right:1px solid var(--line-light);background:rgba(255,255,255,.8);font:inherit;font-weight:900;text-align:center;color:var(--ink)}
+.cart-quantity-control input::-webkit-outer-spin-button,
+.cart-quantity-control input::-webkit-inner-spin-button{margin:0;-webkit-appearance:none}
+.cart-stock-note{font-size:.78rem}
+.cart-option-row{display:grid;gap:6px;margin:8px 0}
+.cart-option-row > span{font-size:.72rem;font-weight:900;color:var(--muted);text-transform:uppercase}
+.cart-color-options,.cart-size-options{display:flex;flex-wrap:wrap;gap:6px}
+.cart-color-options button,.cart-size-options button{
+  display:inline-flex;align-items:center;gap:6px;min-height:32px;padding:6px 8px;border-radius:8px;
+  border:1px solid var(--line-light);background:rgba(255,255,255,.58);color:var(--ink);
+  cursor:pointer;font:inherit;font-size:.78rem;font-weight:850;
+}
+.cart-color-options button.active,.cart-size-options button.active{
+  border-color:rgba(15,118,110,.46);background:rgba(15,118,110,.1);color:var(--accent-2);
+}
+.cart-color-options i{width:15px;height:15px;border-radius:50%;border:1px solid rgba(32,35,42,.16);box-shadow:0 0 0 2px rgba(255,255,255,.56)}
 .cart-total{
   display:grid;gap:8px;margin-top:12px;font-size:.95rem;background:rgba(255,255,255,.46);
   border:1px solid var(--line-light);border-radius:8px;padding:12px 14px;

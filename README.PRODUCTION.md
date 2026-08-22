@@ -52,3 +52,15 @@ Environment variables
 - PAYSTACK_SECRET_KEY - Paystack secret key from the Paystack dashboard
 - PAYSTACK_CURRENCY - payment currency, usually GHS
 - PAYSTACK_CHANNELS - comma-separated Paystack channels, default card,mobile_money
+- SMS_ENABLED - set to true after your SMS provider is ready
+- SMS_PROVIDER - currently arkesel
+- SMS_DEFAULT_COUNTRY_CODE - default country code for local numbers, usually +233
+- SMS_BRAND_NAME - brand text used in the SMS body
+- ARKESEL_API_KEY - Arkesel SMS API key
+- ARKESEL_SENDER_ID - approved Arkesel sender ID, max 11 letters/numbers
+- ARKESEL_CALLBACK_URL - optional public delivery report URL, for example https://your-api-domain.com/api/sms/arkesel/delivery-report
+- DEV_PAYMENT_BYPASS - local testing only; keep false or unset in production
+
+In production, the order-code SMS is sent after Paystack confirms a successful
+payment through transaction verification or the signed webhook. Do not enable
+`DEV_PAYMENT_BYPASS` in production.

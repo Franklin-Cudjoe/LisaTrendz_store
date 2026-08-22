@@ -34,3 +34,17 @@ services:
         value: GHS
       - key: PAYSTACK_CHANNELS
         value: card,mobile_money
+      - key: SMS_ENABLED
+        value: "true"
+      - key: SMS_PROVIDER
+        value: arkesel
+      - key: SMS_DEFAULT_COUNTRY_CODE
+        value: "+233"
+      - key: SMS_BRAND_NAME
+        value: LisaTrendz
+      - key: ARKESEL_API_KEY
+        sync: false
+      - key: ARKESEL_SENDER_ID
+        value: LisaTrendz
+      - key: ARKESEL_CALLBACK_URL
+        value: https://api.lisatrendz.com/api/sms/arkesel/delivery-report
